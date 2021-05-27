@@ -12,8 +12,8 @@ set(myproject_tests_SRCS
         )
 
 # Tests
-include_directories(yamd_tests ${CMAKE_SOURCE_DIR})
-add_executable(myproject_tests ${myproject_SRCS} ${myproject_HDRS} ${myproject_tests_SRCS})
+include_directories(myproject_tests ${CMAKE_SOURCE_DIR})
+add_executable(myproject_tests ${MYPROJECT_SRCS} ${MYPROJECT_HDRS} ${myproject_tests_SRCS})
 target_link_libraries(myproject_tests PUBLIC Eigen3::Eigen gtest gtest_main)
 
 include(GoogleTest)
