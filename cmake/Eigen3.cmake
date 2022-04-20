@@ -1,6 +1,6 @@
 download_external_project(Eigen3
   URL "https://gitlab.com/libeigen/eigen.git"
-  TAG "${_Eigen3_version}-rc1"
+  TAG "${_Eigen3_version}"
   BACKEND GIT
   THIRD_PARTY_SRC_DIR ${_Eigen3_external_dir}
   ${_Eigen3_update}
