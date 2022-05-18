@@ -19,4 +19,5 @@ target_link_libraries(myproject_tests PUBLIC Eigen3::Eigen gtest gtest_main)
 include(GoogleTest)
 gtest_discover_tests(myproject_tests)
 
-add_test(NAME myproject_tests COMMAND myproject_tests)
+# For tests that do not use GTest
+# add_test(NAME <test name> COMMAND <test executable>)
