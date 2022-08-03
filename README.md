@@ -6,15 +6,30 @@ project](https://imtek-simulation.github.io/MolecularDynamics/_project/general_r
 
 ## Getting started
 
-Click the `Use this template` button above, then clone the newly created repository.
-In the cloned repository, run:
+Click the `Use this template` button above, then clone the newly created
+repository, as described in [the first
+milestone](https://imtek-simulation.github.io/MolecularDynamics/_project/milestone01.html).
+
+### Using CLion
+
+If you are using CLion...
+
+### Compiling in the command line
+
+The command line (terminal) may look daunting at first, but it has the advantage
+of being the same across all UNIX platforms, and does not depend on a specific
+IDE. The standard CMake workflow is to create a `build/` directory which will
+contain all the build files. To do that, and compile your project, run:
 
 ```bash
+cd <your repository>
+
 mkdir build
 cd build
 cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
 make
 ./milestones/01/01
+make test
 ```
 
 If there are no errors then you are all set! Note that the flag
