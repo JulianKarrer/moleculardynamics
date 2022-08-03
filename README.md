@@ -86,7 +86,8 @@ show up in the output.
 
 ### Adding to `milestones/`
 
-Create a new directory, e.g. with `mkdir milestones/04`, then create & edit
+Create a new directory, e.g. with `mkdir milestones/04`, uncomment the relevant
+line in `milestones/CMakeLists.txt`, then create & edit
 `milestones/04/CMakeLists.txt`:
 
 ```cmake
