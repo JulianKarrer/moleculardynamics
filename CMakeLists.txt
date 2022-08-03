@@ -42,6 +42,6 @@ if(${USE_MPI})
   find_package(MPI 3 REQUIRED)
 endif()
 
-add_subdirectory(lib)         # Contains our MD library
+add_subdirectory(src)         # Contains our MD library
 add_subdirectory(tests)       # Tests for the library
 add_subdirectory(milestones)  # Code for the different project milestones

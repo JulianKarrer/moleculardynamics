@@ -40,11 +40,11 @@ make
 
 There are three places where you are asked to add code:
 
-- `lib/` is the core of the MD code. Code common to all the simulations you will
+- `src/` is the core of the MD code. Code common to all the simulations you will
   run should be added here. This includes implementation of time stepping
   scheme, potentials, thermostats, neighbor lists, atom containers, and
   implementation files that will be provided by us (e.g. domain decomposition
-  implementation). The `CMakeLists.txt` file in `lib/` creates a [static
+  implementation). The `CMakeLists.txt` file in `src/` creates a [static
   library](https://en.wikipedia.org/wiki/Static_library) which is linked to all
   the other targets in the repository, and which propagates its dependency, so
   that there is no need to explicitely link against Eigen or MPI.
@@ -56,9 +56,9 @@ There are three places where you are asked to add code:
 - `milestones/` contains the "real physics" simulations that are required in
   milestones 04, 07, 08, 09.
 
-### Adding to `lib/`
+### Adding to `src/`
 
-Adding files to `lib/` is straightforward: create your files, e.g. `lj.h` and
+Adding files to `src/` is straightforward: create your files, e.g. `lj.h` and
 `lj.cpp`, then the `MY_MD_HEADERS` and `MY_MD_CPP` variables in
 `CMakeLists.txt`:
 
