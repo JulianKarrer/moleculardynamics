@@ -1,5 +1,5 @@
 # CMake base setup
-cmake_minimum_required(VERSION 3.11)
+cmake_minimum_required(VERSION 3.14)
 include(FetchContent)
 
 # Define project info
@@ -23,22 +23,37 @@ set(CMAKE_CXX_STANDARD 17)
 find_package(Eigen3 3.4.0 EXACT NO_MODULE)
 
 # If not installed, fetch Eigen from the web
-if(NOT ${Eigen3_FOUND})
+if(NOT Eigen3_FOUND)
+  set(EIGEN_BUILD_TESTING OFF CACHE BOOL "Turn off tests" FORCE)
+
   FetchContent_Declare(
     Eigen3
     URL https://gitlab.com/libeigen/eigen/-/archive/3.4.0/eigen-3.4.0.tar.gz
     URL_HASH SHA256=8586084f71f9bde545ee7fa6d00288b264a2b7ac3607b974e54d13e7162c1c72
   )
 
-  FetchContent_MakeAvailable(Eigen3)
-  find_package(Eigen3 3.4.0 REQUIRED EXACT NO_MODULE)
+  # We are not using FetchContent_MakeAvailable since that pulls in all
+  # of Eigen's tests
+  FetchContent_GetProperties(Eigen3)
+  if (NOT Eigen3_POPULATED)
+    FetchContent_Populate(Eigen3)  # Downloading Eigen
+  endif()
+
+  message(STATUS "Populated Eigen3 directory: ${eigen3_SOURCE_DIR}")
+
+  # Setting up search of Eigen
+  set(CMAKE_MODULE_PATH ${eigen3_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
+  set(CMAKE_PREFIX_PATH ${eigen3_SOURCE_DIR} ${CMAKE_PREFIX_PATH})
+
+  # Use FindEigen3.cmake from Eigen distribution
+  find_package(Eigen3 3.4.0 REQUIRED MODULE EXACT)
 endif()
 
 # Option to turn ON/OFF MPI
 set(USE_MPI OFF CACHE BOOL "Activate MPI")
 
 # Find MPI if requested
-if(${USE_MPI})
+if(USE_MPI)
   find_package(MPI 3 REQUIRED)
 endif()
 
