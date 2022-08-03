@@ -10,9 +10,27 @@ Click the `Use this template` button above, then clone the newly created
 repository, as described in [the first
 milestone](https://imtek-simulation.github.io/MolecularDynamics/_project/milestone01.html).
 
-### Using CLion
+### Compiling using CLion
 
-If you are using CLion...
+If you are using CLion, you can open your freshly cloned project by clicking on the "Open"
+button in the CLion welcome window. If prompted, trust the project. Then follow
+the wizard until you see a window that defined the "Profiles", which should look
+like this:
+
+![clion profile window](clion_profiles.png)
+
+Change the default "Debug" value of the option "Build type" to "RelWithDebInfo".
+If you've missed the wizard, you can go back to this dialog in "File >
+Settings > Build, Execution, Deployment > CMake".
+
+To run the first milestone executable, click on the dialog directly right of the
+green hammer in the upper right toolbar, select "01", and click
+the green arrow right of that dialog. You should see the output in the "Run"
+tab, in the lower main window.
+
+To run the tests, select "All CTest" in the same dialog, then run. In the lower
+window, on the right, appears a panel that enumerates all the tests that were
+run and their results.
 
 ### Compiling in the command line
 
@@ -24,10 +42,15 @@ contain all the build files. To do that, and compile your project, run:
 ```bash
 cd <your repository>
 
+# Create build directory
 mkdir build
 cd build
+
+# Configure & compile
 cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
 make
+
+# Run executable and tests
 ./milestones/01/01
 make test
 ```
@@ -138,3 +161,11 @@ git push
 This repository is setup with continuous integration (CI), so all your tests
 will run automatically when you push. This is very handy to test if you have
 breaking changes.
+
+### Git in CLion
+
+If you are using CLion, you can use Git directly from its interface. To add
+files, right click the file you wish to add, then "Git > Add". Once you are
+ready to commit, "Git > Commit" from the main menu bar. Add a message in the
+lower left window where it reads "Commit message", then click "Commit" or
+"Commit and Push...".

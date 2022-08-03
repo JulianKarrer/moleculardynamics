@@ -1,5 +1,6 @@
 # Custom files here
-*.xyz  # XYZ trajectory files
+*.xyz
+.idea
 
 # -------------- Below are genereated exclusion patterns ----------------------
 
