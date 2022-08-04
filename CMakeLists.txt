@@ -50,7 +50,7 @@ if(NOT Eigen3_FOUND)
 endif()
 
 # Option to turn ON/OFF MPI
-set(USE_MPI OFF CACHE BOOL "Activate MPI")
+option(USE_MPI "Activate MPI")
 
 # Find MPI if requested
 if(USE_MPI)
