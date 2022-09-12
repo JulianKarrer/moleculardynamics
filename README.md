@@ -12,6 +12,10 @@ milestone](https://imtek-simulation.github.io/MolecularDynamics/_project/milesto
 
 ### Compiling using CLion
 
+> Note: for Windows users, please follow [these
+> instructions](https://www.jetbrains.com/help/clion/how-to-use-wsl-development-environment-in-product.html)
+> in addition to the text below.
+
 If you are using CLion, you can open your freshly cloned project by clicking on
 the "Open" button in the CLion welcome window. If prompted, trust the project.
 Then follow the wizard until you see a window that defined the "Profiles", which
