@@ -12,16 +12,23 @@ milestone](https://imtek-simulation.github.io/MolecularDynamics/_project/milesto
 
 ### Compiling using CLion
 
-If you are using CLion, you can open your freshly cloned project by clicking on the "Open"
-button in the CLion welcome window. If prompted, trust the project. Then follow
-the wizard until you see a window that defined the "Profiles", which should look
-like this:
+If you are using CLion, you can open your freshly cloned project by clicking on
+the "Open" button in the CLion welcome window. If prompted, trust the project.
+Then follow the wizard until you see a window that defined the "Profiles", which
+should look something like this:
 
 ![clion profile window](clion_profiles.png)
 
-Change the default "Debug" value of the option "Build type" to "RelWithDebInfo".
-If you've missed the wizard, you can go back to this dialog in "File >
-Settings > Build, Execution, Deployment > CMake".
+If you've missed the wizard, you can go back to this dialog in "**File >
+Settings > Build, Execution, Deployment > CMake**". This windows allows to set the
+`CMAKE_BUILD_TYPE` variable, which controls the level of optimization applied to
+the code. `Debug` disables optimizations and turns on useful debugging features.
+This mode should be used when developing and testing code.
+`Release` turns on aggressive optimization. This mode should be used when
+running production simulations.
+
+Add a `Debug` profile and a `Release` profile. When compiling, you can switch
+between them in the dialog right of the green hammer.
 
 To run the first milestone executable, click on the dialog directly right of the
 green hammer in the upper right toolbar, select "01", and click
@@ -31,6 +38,9 @@ tab, in the lower main window.
 To run the tests, select "All CTest" in the same dialog, then run. In the lower
 window, on the right, appears a panel that enumerates all the tests that were
 run and their results.
+
+Try compiling and running for both `Debug` and `Release` configurations. Don't
+forget to switch between them when testing code or running production simulations.
 
 ### Compiling in the command line
 
@@ -47,7 +57,7 @@ mkdir build
 cd build
 
 # Configure & compile
-cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
+cmake -DCMAKE_BUILD_TYPE=Debug ..
 make
 
 # Run executable and tests
@@ -56,11 +66,13 @@ make test
 ```
 
 If there are no errors then you are all set! Note that the flag
-`-DCMAKE_BUILD_TYPE=RelWithDebInfo` should be changed to
+`-DCMAKE_BUILD_TYPE=Debug` should be changed to
 `-DCMAKE_BUILD_TYPE=Release` when you run a production simulation, i.e. a
 simulation with more than a few hundred atoms. This turns on aggressive compiler
 optimizations, which results in speedup. However, when writing the code and
-looking for bugs, `RelWithDebInfo` should be good enough.
+looking for bugs, `Debug` should be used instead.
+
+Try compiling and running tests with both compilation configurations.
 
 ### Compiling on bwUni, with MPI
 
