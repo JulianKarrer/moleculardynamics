@@ -18,10 +18,12 @@ target_include_directories(my_md_lib INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 # Link against Eigen (automatically sets up the includes)
 target_link_libraries(my_md_lib PUBLIC Eigen3::Eigen)
 
+# Add reasonable warning flags
+target_compile_options(my_md_lib PUBLIC -Wall -Wextra -Wpedantic)
+
 # Set up MPI includes and library linking
 # This also propagates to further targets
 if (MPI_FOUND)
-  target_compile_options(my_md_lib PUBLIC -Wall -Wextra -Wpedantic)
   target_compile_definitions(my_md_lib INTERFACE USE_MPI)
   target_include_directories(my_md_lib PUBLIC ${MPI_CXX_INCLUDE_DIRS} SYSTEM)
   target_link_libraries(my_md_lib PUBLIC MPI::MPI_CXX)
