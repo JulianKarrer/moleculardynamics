@@ -108,7 +108,9 @@ There are three places where you are asked to add code:
   potentials, thermostats, etc., but it should not contain "real physics"
   simulations, such as heat capacity calculations.
 - `milestones/` contains the "real physics" simulations that are required in
-  milestones 04, 07, 08, 09.
+  milestones 04, 07, 08, 09. It should only contain code specific to the
+  milestones, i.e. the `main()` function running the simulation, and input data
+  files that we provide.
 
 ### Adding to `src/`
 
@@ -159,6 +161,24 @@ int main(int argc, char* argv[]) {
 ```
 
 The code of your simulation goes into the `main()` function.
+
+#### Input files
+
+We often provide input files (`.xyz` files) for your simulations, for example in
+milestone 4. You should place these in e.g. `milestones/04/`, and add the
+following to `milestones/04/CMakeLists.txt`:
+
+```cmake
+add_input_file(04 lj54.xyz)
+```
+
+This will copy the file `milestone/04/lj54.xyz` to
+`<build>/milestone/04/lj54.xyz`, but **only** when the executable for the milestone
+is rebuilt. To trigger a rebuild you can erase the `<build>/milestone/04`
+directory and `make` again.
+
+*Note:* `.xyz` files are ignored by Git. That's on purpose to avoid you staging
+very large files in the git tree.
 
 ## Pushing code to GitHub
 

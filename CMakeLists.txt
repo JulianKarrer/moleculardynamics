@@ -2,6 +2,11 @@
 cmake_minimum_required(VERSION 3.14)
 include(FetchContent)
 
+# Silencing a warning in FetchContent
+if(POLICY CMP0135)
+  cmake_policy(SET CMP0135 NEW)
+endif()
+
 # Define project info
 project(
   my_md_code
