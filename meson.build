@@ -7,7 +7,7 @@ project(
 )
 
 eigen = dependency('eigen3')
-mpi = dependency('mpi')
+mpi = dependency('mpi', language: 'cpp')
 
 subdir('src')
 subdir('milestones')
