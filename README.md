@@ -78,7 +78,7 @@ Try compiling and running tests with both compilation configurations.
 The above steps should be done *after* loading the appropriate packages:
 
 ```bash
-module load compiler/gnu lib/eigen mpi/openmpi
+module load compiler/gnu mpi/openmpi
 
 # then in build/
 meson setup builddir --buildtype=release
