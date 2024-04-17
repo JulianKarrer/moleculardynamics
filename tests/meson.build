@@ -5,10 +5,12 @@ test_sources = [
   'gtest_mpi_main.cpp'
 ]
 
-executable(
+tests = executable(
 	'tests',
 	test_sources,
 	include_directories : [lib_incdirs],
 	link_with : [lib],
 	dependencies : [eigen, google_test, mpi]
 )
+
+test('Tests', tests)
