@@ -39,11 +39,11 @@ run and their results.
 Try compiling and running for both `debug` and `release` configurations. Don't
 forget to switch between them when testing code or running production simulations.
 
-### Compiling in the command line
+### Compiling from the command line
 
 The command line (terminal) may look daunting at first, but it has the advantage
 of being the same across all UNIX platforms, and does not depend on a specific
-IDE. The standard CMake workflow is to create a `builddir/` directory which will
+IDE. The standard Meson workflow is to create a `builddir/` directory which will
 contain all the build files. To do that, and compile your project, run:
 
 ```bash
@@ -78,7 +78,7 @@ Try compiling and running tests with both compilation configurations.
 The above steps should be done *after* loading the appropriate packages:
 
 ```bash
-module load compiler/gnu devel/cmake mpi/openmpi
+module load compiler/gnu mpi/openmpi
 
 # then in build/
 meson setup builddir --buildtype=release
@@ -136,11 +136,11 @@ to `milestones/meson.build`, then create & edit
 
 ```meson
 executable(
-        'milestone04',
-        'main.cpp',
-        include_directories : [lib_incdirs],
-        link_with : [lib],
-        dependencies : [eigen, mpi]
+    'milestone04',
+    'main.cpp',
+    include_directories : [lib_incdirs],
+    link_with : [lib],
+    dependencies : [eigen, mpi]
 )
 ```
 
@@ -161,14 +161,15 @@ We often provide input files (`.xyz` files) for your simulations, for example in
 milestone 4. You should place these in e.g. `milestones/04/`, and add the
 following to `milestones/04/meson.build`:
 
-```cmake
-add_input_file(04 lj54.xyz)
+```meson
+fs = import('fs')
+fs.copyfile('lj54.xyz')
 ```
 
 This will copy the file `milestone/04/lj54.xyz` to
 `<build>/milestone/04/lj54.xyz`, but **only** when the executable for the milestone
 is rebuilt. To trigger a rebuild you can erase the `<build>/milestone/04`
-directory and `make` again.
+directory and `meson compile` again.
 
 *Note:* `.xyz` files are ignored by Git. That's on purpose to avoid you staging
 very large files in the git tree.
