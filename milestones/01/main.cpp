@@ -1,12 +1,11 @@
 #include "hello.h"
 #include <Eigen/Dense>
-#include <iostream>
 #include <filesystem>
+#include <iostream>
 
 #ifdef USE_MPI
 #include <mpi.h>
 #endif
-
 
 int main(int argc, char *argv[]) {
     int rank = 0, size = 1;
@@ -23,12 +22,13 @@ int main(int argc, char *argv[]) {
     std::cout << "Hello I am rank " << rank << " of " << size << "\n";
 
     if (rank == 0)
-      hello_eigen();
+        hello_eigen();
 
     auto input_path = "./simulation_test_input.txt";
 
     if (not std::filesystem::exists(input_path))
-      std::cerr << "warning: could not find input file " << input_path << "\n";
+        std::cerr << "warning: could not find input file " << input_path
+                  << "\n";
 
 #ifdef USE_MPI
     MPI_Finalize();
