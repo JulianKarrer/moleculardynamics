@@ -50,8 +50,9 @@ TEST(VerletTest, GravityParticleAcceleratesCorrectly) {
     double pvy, x, y, z, vx, vy, vz, fx, fz, t;
     pvy = x = y = z = vx = vy = vz = fx = fz = t = 0.;
     double fy, g;
-    fy = g = -9.81;
+    g = -9.81;
     double m = 1.;
+    fy = g * m;
     double dt = 0.1;
     // iteratively check assertions
     for (uint i = 0; i < 50; i++) {
@@ -87,8 +88,8 @@ inline void gravity_forces_orbit_xy(double x, double y, double z, double &fx,
 }
 
 // Test if a point mass under gravity at the right initial speed
-// (|v_init| = sqrt(g/r_0))orbits a mass at the origin
-// 1)  in a perfect circle
+// (|v_init| = sqrt(g/r_0)) orbits a mass at the origin
+// 1) in a perfect circle
 // 2) at constant velocity
 // 3) only in the initial plane of the orbit
 TEST(VerletTest, GravityParticleOrbits) {

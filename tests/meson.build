@@ -3,7 +3,8 @@ google_test = dependency('gtest')
 test_sources = [
   'test_hello_world.cpp',
   'gtest_mpi_main.cpp',
-  'test_verlet.cpp'
+  'test_verlet.cpp',
+	'test_verlet_eigen.cpp'
 ]
 
 tests = executable(
