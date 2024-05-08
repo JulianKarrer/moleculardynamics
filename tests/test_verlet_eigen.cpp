@@ -18,10 +18,10 @@ TEST(VerletEigenTest, GravityParticleAcceleratesCorrectly) {
     double dt = .1;
     double g = -9.81;
     double t = 0.;
+    positions.setZero();
+    velocities.setZero();
+    prev_velocities.setZero();
     for (int i = 0; i < nb_atoms; i++) {
-        positions.col(i) = Vec3_t{0., 0., 0.};
-        velocities.col(i) = Vec3_t{0., 0., 0.};
-        prev_velocities.col(i) = Vec3_t{0., 0., 0.};
         forces.col(i) = Vec3_t{0., g * m, 0.};
     }
     for (uint step = 0; step < 100; step++) {
@@ -70,11 +70,11 @@ TEST(VerletEigenTest, GravityParticleOrbits) {
     double dt = 0.1;
     double g = 100;
     // spawn atoms at radii 150.+2.*i
+    forces.setZero();
     for (int i = 0; i < nb_atoms; i++) {
         double r = 150. + 2. * ((double)i);
         positions.col(i) = Vec3_t{r, 0., 0.};
         velocities.col(i) = Vec3_t{0., -sqrt(g / r), 0.};
-        forces.col(i) = Vec3_t{0., 0., 0.};
     }
     for (uint step = 0; step < 500; step++) {
         gravity_forces_orbit_xy(positions, forces, g, m, nb_atoms);
