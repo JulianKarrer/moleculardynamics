@@ -16,6 +16,8 @@ class Atoms {
 
     Atoms(const size_t n);
 
+    Atoms(const size_t n, double radius);
+
     Atoms(const Positions_t &p);
 
     Atoms(const Positions_t &p, const Velocities_t &v);
