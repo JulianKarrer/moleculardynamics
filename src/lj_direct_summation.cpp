@@ -28,7 +28,7 @@ double lj_potential(double r, double epsilon, double sigma) {
 /// @param r distance between the two atoms
 /// @param epsilon the binding energy of the Lennard-Jones potential
 /// (commonly given in electron volts)
-/// @param sigma the distance for which the potential has its minimum
+/// @param sigma the distance for which the potential is zero
 /// (commonly given in Ångström)
 /// @return the derivative of the Lennard-Jones potential
 double lj_potential_derivative(double r, double epsilon, double sigma) {
@@ -52,7 +52,7 @@ double lj_potential_derivative(double r, double epsilon, double sigma) {
 /// @param atoms the atoms that interact. The field `forces` is written to.
 /// @param epsilon the binding energy of the Lennard-Jones potential
 /// (commonly given in electron volts)
-/// @param sigma the distance for which the potential has its minimum
+/// @param sigma the distance for which the potential is zero
 /// (commonly given in Ångström)
 /// @return the total potential energy of the system.
 double lj_direct_summation(Atoms &atoms, double epsilon, double sigma) {

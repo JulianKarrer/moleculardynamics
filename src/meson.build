@@ -3,6 +3,7 @@ lib_sources = [  # All source files (excluding headers)
     'verlet.cpp',
     'atoms.cpp',
     'lj_direct_summation.cpp',
+    'thermostat.cpp',
     'xyz.cpp'
 ]
 

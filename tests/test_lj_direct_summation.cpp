@@ -39,7 +39,8 @@ TEST(LJDirectSummationTest, Forces) {
     atoms.positions.setRandom(); // random numbers between -1 and 1
 
     // compute and store energy of the indisturbed configuration
-    double e0{lj_direct_summation(atoms, epsilon, sigma)};
+    // cast summation result to void so the unused warning is surpressed
+    (void)lj_direct_summation(atoms, epsilon, sigma);
     Forces_t forces0{atoms.forces};
 
     // loop over all atoms and compute forces from a finite differences
@@ -82,13 +83,13 @@ TEST(LJDirectSummationTest, CorrectMinimumAndEquilibriumDistance) {
     double r_min = pow(2, 1. / 6.) * sigma;
     atoms.positions(0, 0) = -r_min / 2.;
     atoms.positions(0, 1) = r_min / 2.;
-    double m{1.};
     double dt{0.001};
 
     for (int i{0}; i < 5000; ++i) {
-        verlet_step1(atoms.positions, atoms.velocities, atoms.forces, dt, m);
+        verlet_step1(atoms.positions, atoms.velocities, atoms.forces, dt,
+                     atoms.masses);
         lj_direct_summation(atoms, epsilon, sigma);
-        verlet_step2(atoms.velocities, atoms.forces, dt, m);
+        verlet_step2(atoms.velocities, atoms.forces, dt, atoms.masses);
         double potential = lj_direct_summation(atoms, epsilon, sigma);
         // assert that particles at r_min distance stay at that distance
         Vec3_t distance{atoms.positions.col(0) - atoms.positions.col(1)};
@@ -104,29 +105,33 @@ TEST(LJDirectSummationTest, MomentumConserved) {
     constexpr double epsilon{0.7};
     constexpr double sigma{0.3};
     constexpr double v_init{0.1};
-    constexpr double m{1.};
     constexpr double dt{0.001};
     Atoms atoms(nb_atoms);
     atoms.positions.setRandom();
+
+    // calculate the momentum of the randomly initialized atoms
     Vec3_t momentum_init{Vec3_t(0., 0., 0.)};
     for (int i{0}; i < nb_atoms; ++i) {
         Vec3_t v{Vec3_t(0., 0., 0.)};
         v.setRandom();
         v.normalize();
         ((Vec3_t)atoms.velocities.col(i)) = v * v_init;
-        momentum_init += ((Vec3_t)atoms.velocities.col(i)) * m;
+        momentum_init += ((Vec3_t)atoms.velocities.col(i)) * atoms.masses(i);
     }
 
+    // execute 10_000 simulation steps
     for (int i{0}; i < 10000; ++i) {
-        verlet_step1(atoms.positions, atoms.velocities, atoms.forces, dt, m);
+        verlet_step1(atoms.positions, atoms.velocities, atoms.forces, dt,
+                     atoms.masses);
         lj_direct_summation(atoms, epsilon, sigma);
-        verlet_step2(atoms.velocities, atoms.forces, dt, m);
+        verlet_step2(atoms.velocities, atoms.forces, dt, atoms.masses);
         lj_direct_summation(atoms, epsilon, sigma);
     }
 
+    // calculate the momentum again and compare it to the initial value
     Vec3_t momentum_after{Vec3_t(0., 0., 0.)};
     for (int i{0}; i < nb_atoms; ++i) {
-        momentum_after += ((Vec3_t)atoms.velocities.col(i)) * m;
+        momentum_after += ((Vec3_t)atoms.velocities.col(i)) * atoms.masses(i);
     }
     EXPECT_NEAR(momentum_after.norm(), momentum_init.norm(), 1e-6);
 }
