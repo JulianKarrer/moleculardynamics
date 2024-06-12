@@ -4,6 +4,8 @@ lib_sources = [  # All source files (excluding headers)
     'atoms.cpp',
     'lj_direct_summation.cpp',
     'thermostat.cpp',
+    'neighbors.cpp',
+    'lj.cpp',
     'xyz.cpp'
 ]
 

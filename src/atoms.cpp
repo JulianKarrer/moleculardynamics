@@ -2,38 +2,15 @@
 #include <algorithm>
 #include <iostream>
 
-/// @brief Initialize a set of `n` atoms. Masses are 1, all vectors are 0.
-/// @param n number of atoms
-Atoms::Atoms(const size_t n)
-    : positions{3, n},
-      velocities{3, n},
-      forces{3, n},
-      masses{n} {
-    positions.setZero();
-    velocities.setZero();
-    forces.setZero();
-    masses.setOnes();
-};
-
-/// @brief Initialize a set of `n` atoms with masses of `1` and zero velocities
-/// on a body-centered cubic lattice, given a spacing between grid points.
-/// The bounding volume of the lattice is optimized to be as close to cube
-/// shaped as possible and centred around the origin.
+/// @brief Initialize positions on an oblique lattice, given a spacing between
+/// grid points. The bounding volume of the lattice is optimized to be close to
+/// cube shaped and centred around the origin.
 ///
 /// https://www5.in.tum.de/lehre/vorlesungen/sci_compII/ss06/lectures/01_molecular_dynamics.pdf
 /// (slide 18)
 /// @param n number of atoms
 /// @param spacing 0.5*spacing between atoms in the lattice
-Atoms::Atoms(const size_t n, double spacing)
-    : positions{3, n},
-      velocities{3, n},
-      forces{3, n},
-      masses{n} {
-    positions.setZero();
-    velocities.setZero();
-    forces.setZero();
-    masses.setOnes();
-
+void initialize_lattice(Positions_t &positions, size_t n, double spacing) {
     // decompose uint N into uints x,y,z such that x*y*z=N and
     // max(x,y,z)-min(x,y,z) is minimal (~ find the must cube-y cuboid of
     // integer sizes and volume N).
@@ -61,9 +38,8 @@ Atoms::Atoms(const size_t n, double spacing)
             }
         }
     }
-
-    std::cout << "decomposition: " << best_x << "x " << best_y << "y " << best_z
-              << "z " << "\n";
+    std::cout << " x:" << best_x << " y:" << best_y << " z:" << best_z
+              << std::endl;
     // having found an XYZ decomposition, initialize the lattice
     size_t i{0};
     for (size_t x{0}; x < best_x; x++) {
@@ -76,12 +52,45 @@ Atoms::Atoms(const size_t n, double spacing)
                 // place the particles
                 positions(0, i) = x * delta - best_x * delta * 0.5 + offset;
                 positions(1, i) = y * delta - best_y * delta * 0.5 + offset;
-                positions(2, i) = z * delta - best_z * delta * 0.5;
+                positions(2, i) =
+                    z * delta / M_SQRT2 - best_z * delta / M_SQRT2 * 0.5;
                 i++;
             }
         }
     }
-    std::cout << "grid ok\n";
+}
+
+/// @brief Initialize a set of `n` atoms. Masses are 1, all vectors are 0.
+/// @param n number of atoms
+Atoms::Atoms(const size_t n)
+    : positions{3, n},
+      velocities{3, n},
+      forces{3, n},
+      masses{n},
+      names(n, "H") {
+    positions.setZero();
+    velocities.setZero();
+    forces.setZero();
+    masses.setOnes();
+};
+
+/// @brief Initialize a set of `n` atoms with masses of `1` and zero velocities
+/// on a lattice, given a spacing between grid points.
+/// The bounding volume of the lattice is optimized to be as close to cube
+/// shaped as possible and centred around the origin.
+/// @param n number of atoms
+/// @param spacing 0.5*spacing between atoms in the lattice
+Atoms::Atoms(const size_t n, double spacing)
+    : positions{3, n},
+      velocities{3, n},
+      forces{3, n},
+      masses{n},
+      names(n, "H") {
+    positions.setZero();
+    velocities.setZero();
+    forces.setZero();
+    masses.setOnes();
+    initialize_lattice(positions, n, spacing);
 };
 
 /// @brief Initialize a set of atoms at positions `p`. Masses are 1, all other
@@ -91,10 +100,28 @@ Atoms::Atoms(const Positions_t &p)
     : positions{p},
       velocities{3, p.cols()},
       forces{3, p.cols()},
-      masses{p.cols()} {
+      masses{p.cols()},
+      names(p.cols(), "H") {
     velocities.setZero();
     forces.setZero();
     masses.setOnes();
+};
+
+/// @brief Initialize a set of atoms at positions `p` with `names` that
+/// correspond to CamelCase names of elements and determine the mass of the
+/// particle in units of `u`. Initial velocities are zero.
+/// @param p initial positions of the atoms
+Atoms::Atoms(const Names_t names, Positions_t &p)
+    : positions{p},
+      velocities{3, p.cols()},
+      forces{3, p.cols()},
+      masses{p.cols()},
+      names{names} {
+    velocities.setZero();
+    forces.setZero();
+    for (auto i{0}; i < p.cols(); i++) {
+        masses(i) = ELEM_NAME_TO_MASS.at(names[i]);
+    }
 };
 
 /// @brief Initialize a set of atoms at positions `p` with velocities `v`.
@@ -105,7 +132,8 @@ Atoms::Atoms(const Positions_t &p, const Velocities_t &v)
     : positions{p},
       velocities{v},
       forces{3, p.cols()},
-      masses{p.cols()} {
+      masses{p.cols()},
+      names(p.cols(), "H") {
     assert(p.cols() == v.cols());
     forces.setZero();
     masses.setOnes();
@@ -120,7 +148,8 @@ Atoms::Atoms(const Positions_t &p, const Velocities_t &v, const Masses_t &m)
     : positions{p},
       velocities{v},
       forces{3, p.cols()},
-      masses{m} {
+      masses{m},
+      names(p.cols(), "H") {
     assert(p.cols() == v.cols());
     forces.setZero();
 };

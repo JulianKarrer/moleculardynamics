@@ -115,9 +115,9 @@ TEST(VerletTest, GravityParticleOrbits) {
     // timestep
     double dt = 0.1;
     // iteratively check assertions
+    gravity_forces_orbit_xy(x, y, z, fx, fy, fz, g, m);
     for (uint i = 0; i < 500; i++) {
         // calculate forces and integrate time
-        gravity_forces_orbit_xy(x, y, z, fx, fy, fz, g, m);
         verlet_step1(x, y, z, vx, vy, vz, fx, fy, fz, dt, m);
         gravity_forces_orbit_xy(x, y, z, fx, fy, fz, g, m);
         verlet_step2(vx, vy, vz, fx, fy, fz, dt, m);

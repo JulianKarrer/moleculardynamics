@@ -6,6 +6,7 @@ test_sources = [
   'test_verlet.cpp',
 	'test_verlet_eigen.cpp',
 	'test_lj_direct_summation.cpp',
+	'test_neighbors.cpp',
 	'test_thermostat.cpp'
 ]
 

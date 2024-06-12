@@ -76,8 +76,8 @@ TEST(VerletEigenTest, GravityParticleOrbits) {
         positions.col(i) = Vec3_t{r, 0., 0.};
         velocities.col(i) = Vec3_t{0., -sqrt(g / r), 0.};
     }
+    gravity_forces_orbit_xy(positions, forces, g, m, nb_atoms);
     for (uint step = 0; step < 500; step++) {
-        gravity_forces_orbit_xy(positions, forces, g, m, nb_atoms);
         verlet_step1(positions, velocities, forces, dt, m);
         gravity_forces_orbit_xy(positions, forces, g, m, nb_atoms);
         verlet_step2(velocities, forces, dt, m);

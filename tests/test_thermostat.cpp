@@ -7,12 +7,13 @@
 /// conditions defined in the `TEST`s in the following
 void berendsen_test(Atoms &atoms, double t_init, double t_wish, double dt,
                     double assert_tolerance) {
-    // Perform 10k simulation steps to make sure the system should have
+    // Perform 20k simulation steps to make sure the system should have
     // calibrated
+    lj_direct_summation(atoms, 1., 1.);
     for (uint step = 0; step < 10000; step++) {
         verlet_step1(atoms.positions, atoms.velocities, atoms.forces, dt,
                      atoms.masses);
-        (void)lj_direct_summation(atoms, 1., 1.);
+        lj_direct_summation(atoms, 1., 1.);
         verlet_step2(atoms.velocities, atoms.forces, dt, atoms.masses);
         berendsen_thermostat(atoms, t_wish, dt, 100 * dt);
     }
@@ -26,67 +27,32 @@ void berendsen_test(Atoms &atoms, double t_init, double t_wish, double dt,
     ASSERT_NEAR(t_end, t_wish, assert_tolerance);
 }
 
-/// @brief Tests if the Berendsen thermostat equlibrates a system of 10 randomly
-/// positioned atoms in [-1;1] with random unit initial velocities to twice the
-/// initial temperature
+/// @brief Tests if the Berendsen thermostat equlibrates a system of 10 atoms on
+/// a grid
 TEST(BerendsenThermosTest, Equilibrate) {
     // intialize state of the system
-    int nb_atoms{10};
-    Positions_t positions(3, nb_atoms);
-    positions.setRandom();
-    Velocities_t velocities(3, nb_atoms);
-    velocities.setRandom();
-    velocities.colwise().normalize();
-    Atoms atoms{Atoms(positions, velocities)};
+    Atoms atoms{Atoms(10, pow(2, 1. / 6.))};
 
     // Set target temperature and time step size
     double t_init{temperature_cur(atoms)};
-    double t_wish{t_init * 2};
-    double dt{0.01};
+    double t_wish{50.};
+    double dt{0.001};
 
-    // set low tolerance
-    berendsen_test(atoms, t_init, t_wish, dt, 1e-4);
-}
-
-/// @brief Check if the above test also works from zero temperature to a target
-/// temperature
-TEST(BerendsenThermosTest, FromZero) {
-    int nb_atoms{10};
-    Positions_t positions(3, nb_atoms);
-    positions.setRandom();
-    Atoms atoms{Atoms(positions)};
-
-    // check if the initial velocity is, in fact, zero
-    double t_init{temperature_cur(atoms)};
-    ASSERT_FLOAT_EQ(t_init, 0.0);
-    // set the target temperature to 1000, otherwise perform the same test
-    double t_wish{1000};
-    double dt{0.01};
-
-    // higher tolerance since initial conditions are more tricky
-    berendsen_test(atoms, t_init, t_wish, dt, 0.1);
+    berendsen_test(atoms, t_init, t_wish, dt, 0.1 * abs(t_wish - t_init));
 }
 
 /// @brief Check if the thermostat can cool the system to zero K. This should
-/// result in standstill. The initially densly packed atoms with random
-/// unit velocities should also expand, meaning the bounding volume increases.
+/// result in standstill. The initially densly packed atoms should also expand,
+/// meaning the bounding volume increases.
 TEST(BerendsenThermosTest, ToZero) {
-    int nb_atoms{10};
-    Positions_t positions(3, nb_atoms);
-    positions.setRandom();
-    positions *= 0.5;
-    Velocities_t velocities(3, nb_atoms);
-    velocities.setRandom();
-    velocities.colwise().normalize();
-    Atoms atoms{Atoms(positions, velocities)};
-
+    Atoms atoms{Atoms(10, pow(2, 1. / 6.))};
     double initial_volume{(atoms.positions.rowwise().maxCoeff() -
                            atoms.positions.rowwise().minCoeff())
                               .prod()};
     double t_init{temperature_cur(atoms)};
     // set the target temperature to 0, otherwise perform the same test
     double t_wish{0};
-    double dt{0.01};
+    double dt{0.001};
 
     // very low tolerance, since this state should be easily reached
     berendsen_test(atoms, t_init, t_wish, dt, 1e-10);

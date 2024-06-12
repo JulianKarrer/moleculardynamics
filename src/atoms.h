@@ -13,10 +13,13 @@ class Atoms {
     Velocities_t velocities;
     Forces_t forces;
     Masses_t masses;
+    Names_t names;
 
     Atoms(const size_t n);
 
     Atoms(const size_t n, double radius);
+
+    Atoms(const Names_t names, Positions_t &p);
 
     Atoms(const Positions_t &p);
 

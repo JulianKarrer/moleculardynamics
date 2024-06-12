@@ -85,12 +85,12 @@ TEST(LJDirectSummationTest, CorrectMinimumAndEquilibriumDistance) {
     atoms.positions(0, 1) = r_min / 2.;
     double dt{0.001};
 
+    (void)lj_direct_summation(atoms, epsilon, sigma);
     for (int i{0}; i < 5000; ++i) {
         verlet_step1(atoms.positions, atoms.velocities, atoms.forces, dt,
                      atoms.masses);
-        lj_direct_summation(atoms, epsilon, sigma);
+        double potential{lj_direct_summation(atoms, epsilon, sigma)};
         verlet_step2(atoms.velocities, atoms.forces, dt, atoms.masses);
-        double potential = lj_direct_summation(atoms, epsilon, sigma);
         // assert that particles at r_min distance stay at that distance
         Vec3_t distance{atoms.positions.col(0) - atoms.positions.col(1)};
         EXPECT_NEAR(distance.norm(), r_min, 1e-6);
@@ -119,13 +119,13 @@ TEST(LJDirectSummationTest, MomentumConserved) {
         momentum_init += ((Vec3_t)atoms.velocities.col(i)) * atoms.masses(i);
     }
 
+    (void)lj_direct_summation(atoms, epsilon, sigma);
     // execute 10_000 simulation steps
     for (int i{0}; i < 10000; ++i) {
         verlet_step1(atoms.positions, atoms.velocities, atoms.forces, dt,
                      atoms.masses);
-        lj_direct_summation(atoms, epsilon, sigma);
+        (void)lj_direct_summation(atoms, epsilon, sigma);
         verlet_step2(atoms.velocities, atoms.forces, dt, atoms.masses);
-        lj_direct_summation(atoms, epsilon, sigma);
     }
 
     // calculate the momentum again and compare it to the initial value
