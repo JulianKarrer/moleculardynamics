@@ -1,4 +1,4 @@
-#include "lj.h"
+#include "ljts.h"
 #include "lj_direct_summation.h"
 #include "neighbors.h"
 
@@ -13,7 +13,7 @@ double lj_cutoff_potential(double r, double epsilon, double sigma,
 
     return r > cutoff ? 0.0
                       : (lj_potential(r, epsilon, sigma) +
-                         lj_potential(r, epsilon, cutoff));
+                         abs(lj_potential(r, epsilon, cutoff)));
 }
 
 /// @brief compute forces derived from the truncated and shifted Lennard-Jones

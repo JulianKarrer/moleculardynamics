@@ -11,49 +11,24 @@
 /// @param n number of atoms
 /// @param spacing 0.5*spacing between atoms in the lattice
 void initialize_lattice(Positions_t &positions, size_t n, double spacing) {
-    // decompose uint N into uints x,y,z such that x*y*z=N and
-    // max(x,y,z)-min(x,y,z) is minimal (~ find the must cube-y cuboid of
-    // integer sizes and volume N).
-    int root{(int)round(cbrt(n))};
-    // the spacing around the cube root around to search for decompositions
-    // the search complexity is O((2.*searchRadiusMax)^2) = O(1)
-    int searchRadiusMax{100};
-    // remember the best guess so far, start from a valid guess
-    size_t best_x, best_y = 1;
-    size_t best_z{n};
-    size_t best_cubeness{n - 1};
-    // any factor of the decomposition must be in [1; n]
-    size_t lower{(size_t)std::max(root - searchRadiusMax, 1)};
-    size_t upper{(size_t)std::min(root + searchRadiusMax, (int)n)};
-    for (size_t x{lower}; x <= upper; x++) {
-        for (size_t y{lower}; y <= upper; y++) {
-            size_t z{n / (x * y)};
-            // the goodness of the decomposition is the distance between the
-            // maximum and minimum factor
-            size_t cubeness{std::max(x, std::max(y, z)) -
-                            std::min(x, std::min(y, z))};
-            if (n == x * y * z && cubeness < best_cubeness) {
-                best_x = x;
-                best_y = y, best_z = z, best_cubeness = cubeness;
-            }
-        }
-    }
-    std::cout << " x:" << best_x << " y:" << best_y << " z:" << best_z
-              << std::endl;
-    // having found an XYZ decomposition, initialize the lattice
+    size_t cube_length{(size_t)std::ceil(std::cbrt(n))};
     size_t i{0};
-    for (size_t x{0}; x < best_x; x++) {
-        for (size_t y{0}; y < best_y; y++) {
-            for (size_t z{0}; z < best_z; z++) {
-                assert(i < n);
+    for (size_t x{0}; x < cube_length + 1; x++) {
+        for (size_t y{0}; y < cube_length + 1; y++) {
+            for (size_t z{0}; z < cube_length + 1; z++) {
+                if (i >= n) {
+                    return;
+                }
                 double delta = spacing; // * M_SQRT2;
                 // offset xy plane by 0.5 in each z-step to form a
                 double offset{z % 2 == 0 ? delta * 0.25 : -delta * 0.25};
                 // place the particles
-                positions(0, i) = x * delta - best_x * delta * 0.5 + offset;
-                positions(1, i) = y * delta - best_y * delta * 0.5 + offset;
+                positions(0, i) =
+                    x * delta - cube_length * delta * 0.5 + offset;
+                positions(1, i) =
+                    y * delta - cube_length * delta * 0.5 + offset;
                 positions(2, i) =
-                    z * delta / M_SQRT2 - best_z * delta / M_SQRT2 * 0.5;
+                    z * delta / M_SQRT2 - cube_length * delta / M_SQRT2 * 0.5;
                 i++;
             }
         }

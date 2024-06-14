@@ -5,7 +5,7 @@ lib_sources = [  # All source files (excluding headers)
     'lj_direct_summation.cpp',
     'thermostat.cpp',
     'neighbors.cpp',
-    'lj.cpp',
+    'ljts.cpp',
     'xyz.cpp'
 ]
 

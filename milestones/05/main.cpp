@@ -1,5 +1,5 @@
 #include "atoms.h"
-#include "lj.h"
+#include "ljts.h"
 #include "verlet.h"
 #include "xyz.h"
 #include <cmath>

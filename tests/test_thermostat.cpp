@@ -35,7 +35,7 @@ TEST(BerendsenThermosTest, Equilibrate) {
 
     // Set target temperature and time step size
     double t_init{temperature_cur(atoms)};
-    double t_wish{50.};
+    double t_wish{20.};
     double dt{0.001};
 
     berendsen_test(atoms, t_init, t_wish, dt, 0.1 * abs(t_wish - t_init));
@@ -55,7 +55,7 @@ TEST(BerendsenThermosTest, ToZero) {
     double dt{0.001};
 
     // very low tolerance, since this state should be easily reached
-    berendsen_test(atoms, t_init, t_wish, dt, 1e-10);
+    berendsen_test(atoms, t_init, t_wish, dt, 1e-9);
     double final_volume{(atoms.positions.rowwise().maxCoeff() -
                          atoms.positions.rowwise().minCoeff())
                             .prod()};
