@@ -1,3 +1,8 @@
+use kiddo::{NearestNeighbour, SquaredEuclidean};
+use nalgebra::Vector3;
+use rayon::iter::{
+    IndexedParallelIterator, IntoParallelRefIterator, IntoParallelRefMutIterator, ParallelIterator,
+};
 use std::{
     f64::consts::SQRT_2,
     fs::{File, OpenOptions},
@@ -5,15 +10,7 @@ use std::{
     time::Instant,
 };
 
-use kiddo::{
-    immutable::float::kdtree::ImmutableKdTree, KdTree, NearestNeighbour, SquaredEuclidean,
-};
-use nalgebra::Vector3;
-use rayon::iter::{
-    IndexedParallelIterator, IntoParallelRefIterator, IntoParallelRefMutIterator, ParallelIterator,
-};
-
-// switch default allocator
+// switch default allocator for possible performance gain
 use mimalloc::MiMalloc;
 #[global_allocator]
 static GLOBAL: MiMalloc = MiMalloc;
@@ -90,23 +87,26 @@ impl Atoms {
         };
     }
 
+    /// Compute the full lennard-Jones potential by iterating over all pairs of atoms in
+    /// O(n^2)-time
     pub fn lj_direct_sum(&mut self, epsilon: f64, sigma: f64) -> f64 {
         self.frc.fill(Vector3::zeros());
-        self.pos
-            .iter()
+        self.frc
+            .par_iter_mut()
+            .zip(&self.pos)
             .enumerate()
-            .map(|(i, x_i)| {
+            .map(|(i, (frc_i, x_i))| {
                 self.pos
                     .iter()
                     .enumerate()
                     .map(|(j, x_j)| {
-                        if i < j {
+                        if i != j {
                             let r = (x_i - x_j).norm(); // sqrt of the squared distance
                             let r_ij_hat: Vector3<f64> =
                                 (x_i - x_j).try_normalize(1e-15).unwrap_or(Vector3::zeros());
                             let f_ij: Vector3<f64> = r_ij_hat * lj_pot_deriv(r, epsilon, sigma);
-                            self.frc[i] -= f_ij;
-                            self.frc[j] += f_ij;
+                            *frc_i -= f_ij;
+                            // self.frc[j] += f_ij;
                             // return the shifted and truncated potential
                             lj_pot(r, epsilon, sigma)
                         } else {
@@ -118,6 +118,8 @@ impl Atoms {
             .sum::<f64>()
     }
 
+    /// Overwrite the `Atoms`' forces using the truncated and shifted Lennard-Jones
+    /// Potential in O(n)-time using a KD-Tree (Here, in 3D: Octree decomposition)
     pub fn ljts(&mut self, epsilon: f64, sigma: f64, cutoff: f64) -> f64 {
         // reset forces, since we add later!
         self.frc.fill(Vector3::zeros());
@@ -126,28 +128,29 @@ impl Atoms {
         let kd = kiddo::ImmutableKdTree::new_from_slice(
             &self
                 .pos
-                .iter()
+                .par_iter()
                 .map(|p| p.as_ref().to_owned())
                 .collect::<Vec<[f64; 3]>>(),
         );
         // update forces and return the sum of all pair-potentials
-        self.pos
-            .iter()
+        self.frc
+            .par_iter_mut()
+            .zip(&self.pos)
             .enumerate()
-            .map(|(i, x_i)| {
+            .map(|(i, (frc_i, x_i))| {
                 kd.within::<SquaredEuclidean>(&[x_i.x, x_i.y, x_i.z], cutoff)
                     .iter()
                     .map(|NearestNeighbour { distance, item }| {
                         // compute force
                         let r = distance.sqrt(); // sqrt of the squared distance
                         let j = *item as usize;
-                        if i < j && r > 0.0 {
+                        if i != j && r > 0.0 {
                             let x_j = self.pos[j];
                             let r_ij_hat: Vector3<f64> =
                                 (x_i - x_j).try_normalize(1e-15).unwrap_or(Vector3::zeros());
                             let f_ij: Vector3<f64> = r_ij_hat * lj_pot_deriv(r, epsilon, sigma);
-                            self.frc[i] -= f_ij;
-                            self.frc[j] += f_ij;
+                            *frc_i -= f_ij;
+                            // self.frc[j] += f_ij;
                             // return the shifted and truncated potential
                             ljts_pot(r, epsilon, sigma, cutoff)
                         } else {
@@ -159,23 +162,29 @@ impl Atoms {
             .sum()
     }
 
+    /// Calculate the total kinetic energy in the system
     pub fn kinetic_energy(&self) -> f64 {
         self.vel
-            .iter()
+            .par_iter()
             .zip(&self.mas)
             .map(|(v, m)| v.norm_squared() * m * 0.5)
             .sum()
     }
 
+    /// Returns the current temperature of the system in Kelvins, given that
+    /// units are scaled such that energies are given in electron Volts
     pub fn temperature(&self) -> f64 {
         self.kinetic_energy() / (KB_EV * 1.5 * self.nb_atoms())
     }
 
+    /// Use a Berendsen thermostat to softly rescale velocities such that a target
+    /// temperature is reached.
+    /// Should be used AFTER time integration (eg. Velocity Verlet step 2)
     pub fn berendsen_thermostat(&mut self, target_temp: f64, dt: f64, relaxation: f64) {
         let current_temp = self.temperature();
         // avoid division by zero
         if current_temp > 0.0 {
-            self.vel.iter_mut().for_each(|v| {
+            self.vel.par_iter_mut().for_each(|v| {
                 let lambda = (1. + (target_temp / current_temp - 1.) * dt / relaxation).sqrt();
                 *v *= lambda;
             })
@@ -183,7 +192,7 @@ impl Atoms {
     }
 
     /// Write current positions and velocities to .xyz file
-    pub fn write_to_xyz(&self, file: &mut BufWriter<File>) {
+    pub fn _write_to_xyz(&self, file: &mut BufWriter<File>) {
         write!(file, "{}\n\n", self.nb_atoms()).unwrap();
         self.pos.iter().zip(&self.vel).for_each(|(x, v)| {
             write!(
@@ -224,7 +233,7 @@ fn velocity_verlet_step1(
     mas: &MassT,
     dt: f64,
 ) {
-    vel.iter_mut()
+    vel.par_iter_mut()
         .zip(pos)
         .zip(frc)
         .zip(mas)
@@ -236,9 +245,12 @@ fn velocity_verlet_step1(
 
 /// Corrector step of the Velocity Verlet time integration scheme
 fn velocity_verlet_step2(vel: &mut VelocityT, frc: &ForceT, mas: &MassT, dt: f64) {
-    vel.iter_mut().zip(frc).zip(mas).for_each(|((v, f), m)| {
-        *v += (*f * (1. / m)) * dt * 0.5;
-    });
+    vel.par_iter_mut()
+        .zip(frc)
+        .zip(mas)
+        .for_each(|((v, f), m)| {
+            *v += (*f * (1. / m)) * dt * 0.5;
+        });
 }
 
 // define parameters
@@ -250,7 +262,7 @@ const TEMPERATURE: f64 = 100.;
 
 const NB_RUNS: usize = 10;
 const NB_TIMESTEPS: usize = 50;
-const NB_ATOMS_MAX: usize = 750;
+const NB_ATOMS_MAX: usize = 1000;
 const NB_ATOMS_STEP: usize = 50;
 
 fn run_timed(nb_atoms: usize, direct: bool) -> f64 {
@@ -258,11 +270,14 @@ fn run_timed(nb_atoms: usize, direct: bool) -> f64 {
 
     // time the execution of a simulation as seen in milestone 5
     let start = Instant::now();
+
     if direct {
         atoms.lj_direct_sum(EPSILON, SIGMA)
     } else {
         atoms.ljts(EPSILON, SIGMA, CUTOFF)
     };
+
+    // main simulation loop
     for _ in 0..NB_TIMESTEPS {
         // compute lj forces and integrate with velocity verlet
         velocity_verlet_step1(&mut atoms.pos, &mut atoms.vel, &atoms.frc, &atoms.mas, DT);
@@ -281,13 +296,12 @@ fn run_timed(nb_atoms: usize, direct: bool) -> f64 {
 }
 
 fn main() {
-    // open trajectory file
     let mut file: BufWriter<File> = BufWriter::new(
         OpenOptions::new()
             .write(true)
             .create(true)
             .truncate(true)
-            .open("runtimes.csv")
+            .open("runtimes_par.csv")
             .unwrap(),
     );
     // write csv header
@@ -295,8 +309,10 @@ fn main() {
 
     for direct in [false, true] {
         for n in (2.max(NB_ATOMS_STEP)..=NB_ATOMS_MAX).step_by(NB_ATOMS_STEP) {
+            // get runtime data
             println!("Running with {} atoms", n);
             let runs: Vec<f64> = (0..NB_RUNS).map(|_| run_timed(n, direct)).collect();
+            // calculate statistical data to write to csv
             let average = runs.iter().sum::<f64>() / (NB_RUNS as f64);
             let min = runs.iter().min_by(|x, y| x.total_cmp(y)).unwrap();
             let max = runs.iter().max_by(|x, y| x.total_cmp(y)).unwrap();
@@ -317,6 +333,4 @@ fn main() {
             .unwrap();
         }
     }
-
-    // main simulation loop
 }

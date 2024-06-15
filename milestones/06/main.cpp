@@ -19,7 +19,7 @@ const size_t NUMBER_OF_RUNS{10};
 // number of timesteps in each simulation
 const size_t NUMBER_OF_TIMESTEPS{50};
 // maximum number of atoms in the test series
-const size_t NB_ATOMS_MAX{750};
+const size_t NB_ATOMS_MAX{1000};
 // step size of number of atoms in the test series
 const size_t NB_ATOMS_STEP{50};
 
