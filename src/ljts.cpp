@@ -12,8 +12,8 @@ double lj_cutoff_potential(double r, double epsilon, double sigma,
                            double cutoff) {
 
     return r > cutoff ? 0.0
-                      : (lj_potential(r, epsilon, sigma) +
-                         abs(lj_potential(r, epsilon, cutoff)));
+                      : (lj_potential(r, epsilon, sigma) -
+                         lj_potential(cutoff, epsilon, sigma));
 }
 
 /// @brief compute forces derived from the truncated and shifted Lennard-Jones

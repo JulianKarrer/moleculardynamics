@@ -10,6 +10,7 @@
 
 const double DT{0.001};
 const double SIGMA{1.44};
+const double CUTOFF{5. * SIGMA};
 // temperature in kelvins
 const double TEMPERATURE{100.};
 // number of times each run is repeated to get statistics about the runtime
@@ -18,9 +19,9 @@ const size_t NUMBER_OF_RUNS{10};
 // number of timesteps in each simulation
 const size_t NUMBER_OF_TIMESTEPS{50};
 // maximum number of atoms in the test series
-const size_t NB_ATOMS_MAX{1000};
+const size_t NB_ATOMS_MAX{750};
 // step size of number of atoms in the test series
-const size_t NB_ATOMS_STEP{25};
+const size_t NB_ATOMS_STEP{50};
 
 /// @brief Measure the execution time for the equilibration of a Lennard Jones
 /// lattice with direct summation for a given number of atoms and simulation
@@ -34,17 +35,17 @@ double run_timed(size_t nb_atoms, bool direct) {
     // time the execution of a simulation as seen in milestone 5
     auto start = std::chrono::high_resolution_clock::now();
     (void)(direct ? lj_direct_summation(atoms, 1.0, SIGMA)
-                  : ljts(atoms, 1.0, SIGMA, 5.0));
-    for (size_t i{0}; i < NUMBER_OF_TIMESTEPS; ++i) {
+                  : ljts(atoms, 1.0, SIGMA, CUTOFF));
+    for (size_t i{0}; i < NUMBER_OF_TIMESTEPS; i++) {
         verlet_step1(atoms.positions, atoms.velocities, atoms.forces, DT,
                      atoms.masses);
         (void)(direct ? lj_direct_summation(atoms, 1.0, SIGMA)
-                      : ljts(atoms, 1.0, SIGMA, 5.0));
+                      : ljts(atoms, 1.0, SIGMA, CUTOFF));
         verlet_step2(atoms.velocities, atoms.forces, DT, atoms.masses);
         berendsen_thermostat(atoms, TEMPERATURE, DT, 100 * DT);
     }
     auto stop = std::chrono::high_resolution_clock::now();
-    // compute the duration of the loop and print it to a csv file
+    // compute the duration of the loop
     return (double)std::chrono::duration_cast<std::chrono::microseconds>(stop -
                                                                          start)
         .count();
@@ -52,7 +53,7 @@ double run_timed(size_t nb_atoms, bool direct) {
 
 int main(int argc, char *argv[]) {
     // open a csv file and write the header describing the stored data
-    std::ofstream file("runtimes2.csv");
+    std::ofstream file("runtimes3.csv");
     // output all relevant information to the csv file in the format:
     // direct?,nb_atoms,average,min,max,stddev,runtime1, runtime2,...
     file << "direct summation or ljts,number of atoms,average runtime,minimum "

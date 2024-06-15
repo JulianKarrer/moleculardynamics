@@ -9,18 +9,9 @@
 /// (commonly given in Ångström)
 /// @return the Lennard-Jones potential at the distance `r`
 double lj_potential(double r, double epsilon, double sigma) {
-    // calculate (sigma/r)^6 and (sigma/r)^12 in powers of two for efficiency
-    // (logarithmicly vs linearly many operations)
     double sig_over_r = sigma / r;
-    double sig_over_r_2{sig_over_r * sig_over_r};
-    double sig_over_r_4{sig_over_r_2 * sig_over_r_2};
-    double sig_over_r_8{sig_over_r_4 * sig_over_r_4};
-    double sig_over_r_6{sig_over_r_4 *
-                        sig_over_r_2}; // 3 multiplies, one divide
-    double sig_over_r_12{sig_over_r_8 *
-                         sig_over_r_4}; // 4 multiplies, one divide
     // implement the potential as shown in the lecture
-    return 4. * epsilon * (sig_over_r_12 - sig_over_r_6);
+    return 4. * epsilon * (pow(sig_over_r, 12) - pow(sig_over_r, 6));
 }
 
 /// @brief the derivative of the Lennard-Jones potential with respect to the
@@ -33,16 +24,10 @@ double lj_potential(double r, double epsilon, double sigma) {
 /// @return the derivative of the Lennard-Jones potential
 double lj_potential_derivative(double r, double epsilon, double sigma) {
     double sig_over_r = sigma / r;
-    double sig_over_r_2{sig_over_r * sig_over_r};
-    double sig_over_r_4{sig_over_r_2 * sig_over_r_2};
-    double sig_over_r_8{sig_over_r_4 * sig_over_r_4};
-    double sig_over_r_6{sig_over_r_4 *
-                        sig_over_r_2}; // 3 multiplies, one divide
-    double sig_over_r_12{sig_over_r_8 *
-                         sig_over_r_4}; // 4 multiplies, one divide
     // implement the derivative of the potential (note the additional /r terms
     // and multipliers)
-    return epsilon * (-48. * sig_over_r_12 / r + 24. * sig_over_r_6 / r);
+    return epsilon *
+           (-48. * pow(sig_over_r, 12) / r + 24. * pow(sig_over_r, 6) / r);
 }
 
 /// @brief compute forces derived from the Lennard-Jones potential through a

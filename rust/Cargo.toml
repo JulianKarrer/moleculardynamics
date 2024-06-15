@@ -1,8 +1,27 @@
 [package]
-name = "rust"
+name = "moleculardynamics"
 version = "0.1.0"
 edition = "2021"
+description = "Molecular Dynamics Coursework, rewritten in Rust"
+author = "Julian Karrer"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[profile.release]
+# maximize build options for performance
+lto = "fat"
+panic = "abort"
+opt-level = 3
 
 [dependencies]
+# kd tree for fixed-radius neighbour search
+kd-tree = { version = "0.6.0", features = ["rayon", "nalgebra"]}
+kiddo = "4.2.0"
+
+# faster allocation
+mimalloc = { version = "*", default-features = false }
+
+# vectors with SIMD support
+glam = { version = "0.28.0", features = ["fast-math"] }
+nalgebra = "0.32.6"
+
+# multithreading using work stealing
+rayon = "1.10.0"
