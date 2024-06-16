@@ -13,14 +13,12 @@ opt-level = 3
 
 [dependencies]
 # kd tree for fixed-radius neighbour search
-kd-tree = { version = "0.6.0", features = ["rayon", "nalgebra"]}
-kiddo = "4.2.0"
+kiddo = { version = "4.2.0"}
 
 # faster allocation
 mimalloc = { version = "*", default-features = false }
 
 # vectors with SIMD support
-glam = { version = "0.28.0", features = ["fast-math"] }
 nalgebra = "0.32.6"
 
 # multithreading using work stealing

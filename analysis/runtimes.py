@@ -130,12 +130,17 @@ plt.yscale("log")
 plt.tight_layout()
 
 # plot the data
-plot_from_csv("../builddir/runtimes3.csv", "direct", "LJDS-CPP")
+plot_from_csv("../builddir/runtimes.csv", "direct", "LJDS-CPP")
 plot_from_csv("../builddir/runtimes3.csv", "ljts", "LJTS-CPP")
 plot_from_csv("../rust/runtimes.csv", "direct", "LJDS-RS")
 plot_from_csv("../rust/runtimes_par.csv", "direct", "LJDS-RS+R")
 plot_from_csv("../rust/runtimes.csv", "ljts", "LJTS-RS")
 plot_from_csv("../rust/runtimes_par.csv", "ljts", "LJTS-RS+R")
+
+# plot_from_csv("../builddir/runtimes_ts.csv", "ljts", "LJTS-CPP")
+# plot_from_csv("../rust/runtimes_ts.csv", "ljts", "LJTS-RS")
+# plot_from_csv("../rust/runtimes_ts_par.csv", "ljts", "LJTS-RS+R")
+
 labelLines(plt.gca().get_lines(), zorder=2.5, fontsize=8)
 # plt.legend(fontsize="12")
 plt.show()

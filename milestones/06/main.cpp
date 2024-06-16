@@ -53,7 +53,7 @@ double run_timed(size_t nb_atoms, bool direct) {
 
 int main(int argc, char *argv[]) {
     // open a csv file and write the header describing the stored data
-    std::ofstream file("runtimes3.csv");
+    std::ofstream file("runtimes.csv");
     // output all relevant information to the csv file in the format:
     // direct?,nb_atoms,average,min,max,stddev,runtime1, runtime2,...
     file << "direct summation or ljts,number of atoms,average runtime,minimum "

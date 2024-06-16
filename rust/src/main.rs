@@ -63,7 +63,7 @@ impl Atoms {
                     } else {
                         -0.25 * spacing
                     };
-                    let d = i as f64 * 1e-15; // minimal offset so kdtree can fit planes
+                    let d = i as f64 * 1e-10; // minimal offset so kdtree can fit planes
                     res[i] = Vector3::new(
                         x as f64 * spacing - centre + offset + d,
                         y as f64 * spacing - centre + offset + d,
@@ -138,7 +138,7 @@ impl Atoms {
             .zip(&self.pos)
             .enumerate()
             .map(|(i, (frc_i, x_i))| {
-                kd.within::<SquaredEuclidean>(&[x_i.x, x_i.y, x_i.z], cutoff)
+                kd.within_unsorted::<SquaredEuclidean>(&[x_i.x, x_i.y, x_i.z], cutoff)
                     .iter()
                     .map(|NearestNeighbour { distance, item }| {
                         // compute force
@@ -265,6 +265,8 @@ const NB_TIMESTEPS: usize = 50;
 const NB_ATOMS_MAX: usize = 1000;
 const NB_ATOMS_STEP: usize = 50;
 
+/// Run the simulation for `nb_atoms` many atoms, using LJDS or LJTS, and return
+/// the runtime in microseconds.
 fn run_timed(nb_atoms: usize, direct: bool) -> f64 {
     let mut atoms = Atoms::new(nb_atoms, SIGMA);
 
@@ -291,8 +293,7 @@ fn run_timed(nb_atoms: usize, direct: bool) -> f64 {
         // equilibrate the system with a berendesen thermostat
         atoms.berendsen_thermostat(TEMPERATURE, DT, 100. * DT);
     }
-    let time_taken = start.elapsed().as_micros();
-    time_taken as f64
+    start.elapsed().as_micros() as f64
 }
 
 fn main() {
@@ -301,7 +302,7 @@ fn main() {
             .write(true)
             .create(true)
             .truncate(true)
-            .open("runtimes_par.csv")
+            .open("runtimes_ts_par.csv")
             .unwrap(),
     );
     // write csv header
