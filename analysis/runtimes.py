@@ -96,7 +96,7 @@ def labelLines(lines, align=True, xvals=None, **kwargs):
 
 
 # read data from csv and plot it
-def plot_from_csv(filename: str, firstcol: str, name: str):
+def plot_from_csv(filename: str, firstcol: str, name: str, plot_stddev: bool):
     stddev_low: list[float] = []
     stddev_high: list[float] = []
     xs: list[float] = []
@@ -112,35 +112,58 @@ def plot_from_csv(filename: str, firstcol: str, name: str):
     color = next(plt.gca()._get_lines.prop_cycler)['color']
     plt.plot(xs, ys, next(linestyles), label=name,
              marker=next(markerstyles), color=color)
-    # plt.fill_between(xs, stddev_low, stddev_high, color=color, alpha=0.2)
+    if plot_stddev:
+        plt.fill_between(xs, stddev_low, stddev_high, color=color, alpha=0.2)
 
 
 # cycle through styles to improve readability
 linestyles = cycle([".-", "--", "-.", ":"])
 markerstyles = cycle(["o", "v", "s", "D", "X", "^", "*"])
 
-# setup titles, legends etc
-plt.suptitle("Average runtime across 10 simulations of 50 timesteps each for the LJDS (direct summation) \
-             and LJTS (truncated and shifted) potential in C++, Rust and Rust+Rayon respectively")
-# plt.figtext(0.5, 0.02, "(shaded regions show the corrected standard deviation)", ha="center",
-#             fontsize=10)
-plt.xlabel(r"Number of Atoms")
-plt.ylabel(r"Average Runtime in Microseconds ($\mu s$)")
-plt.yscale("log")
-plt.tight_layout()
 
 # plot the data
-plot_from_csv("../builddir/runtimes.csv", "direct", "LJDS-CPP")
-plot_from_csv("../builddir/runtimes3.csv", "ljts", "LJTS-CPP")
-plot_from_csv("../rust/runtimes.csv", "direct", "LJDS-RS")
-plot_from_csv("../rust/runtimes_par.csv", "direct", "LJDS-RS+R")
-plot_from_csv("../rust/runtimes.csv", "ljts", "LJTS-RS")
-plot_from_csv("../rust/runtimes_par.csv", "ljts", "LJTS-RS+R")
+def plot_all_sets(log: bool, legend: bool, plot_stddev: bool):
+    # setup titles, legends etc
+    plt.suptitle("Average runtime across 10 simulations of 50 timesteps each for the LJDS (direct summation) \
+                and LJTS (truncated and shifted) potential in C++, Rust and Rust+Rayon respectively")
+    plt.xlabel(r"Number of Atoms")
+    plt.ylabel(r"Average Runtime in Microseconds ($\mu s$)")
+    plt.tight_layout()
+    plt.gcf().set_size_inches(18., 9., forward=True)
+    plot_from_csv("../builddir/runtimes.csv",
+                  "direct", "LJDS-CPP", plot_stddev)
+    plot_from_csv("../builddir/runtimes.csv", "ljts", "LJTS-CPP", plot_stddev)
+    plot_from_csv("../rust/runtimes.csv", "direct", "LJDS-RS", plot_stddev)
+    plot_from_csv("../rust/runtimes_par.csv",
+                  "direct", "LJDS-RS+R", plot_stddev)
+    plot_from_csv("../rust/runtimes.csv", "ljts", "LJTS-RS", plot_stddev)
+    plot_from_csv("../rust/runtimes_par.csv", "ljts", "LJTS-RS+R", plot_stddev)
+    if legend:
+        plt.legend(fontsize="12")
+    else:
+        labelLines(plt.gca().get_lines(), zorder=2.5, fontsize=8)
+    if log:
+        plt.yscale("log")
+    else:
+        plt.yscale("linear")
+    if plot_stddev:
+        plt.figtext(0.5, 0.02, "(shaded regions show the corrected standard deviation)", ha="center",
+                    fontsize=10)
+    # plt.show()
+    plt.savefig("runtimes"
+                + ("_log" if log else "")
+                + ("_legend" if legend else "")
+                + ("_stddev" if plot_stddev else "")
+                + ".png")
+    plt.clf()
+
+
+# plot all variations of the graph and save to file
+for log in [True, False]:
+    for legend in [True, False]:
+        for plot_stddev in [True, False]:
+            plot_all_sets(log, legend, plot_stddev)
 
 # plot_from_csv("../builddir/runtimes_ts.csv", "ljts", "LJTS-CPP")
 # plot_from_csv("../rust/runtimes_ts.csv", "ljts", "LJTS-RS")
 # plot_from_csv("../rust/runtimes_ts_par.csv", "ljts", "LJTS-RS+R")
-
-labelLines(plt.gca().get_lines(), zorder=2.5, fontsize=8)
-# plt.legend(fontsize="12")
-plt.show()

@@ -1,6 +1,6 @@
 # Molecular Dynamics in C++
 
-Repository for coursework concerning the summer 2024 course [Molecular Dynamics in C++](https://pastewka.github.io/MolecularDynamics/) at the University of Freiburg.
+Repository for coursework concerning the summer 2024 course [Molecular Dynamics in C++](https://pastewka.github.io/MolecularDynamics/) at the University of Freiburg, forked from [the MD Meson Template](https://github.com/imtek-simulation/meson-skeleton/).
 
 
 - `/src` and `/tests` contain the library source code and tests in C++ using Eigen and gtest
