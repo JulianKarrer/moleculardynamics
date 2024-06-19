@@ -64,3 +64,23 @@ TEST(BerendsenThermosTest, ToZero) {
               << "final volume: " << final_volume << "\n";
     ASSERT_GT(final_volume, initial_volume);
 }
+
+/// @brief Check if a single atom at the origin with initial unit velocity
+/// in x-direction speeds up to the velocity dictated by the target 
+/// kinetic energy
+TEST(BerendsenThermosTest, SingleAtom) {
+    // set initial position at origin and initial velocity to unit vector in x-direction
+    Atoms atoms{Atoms(1)};
+    atoms.positions.setZero();
+    atoms.velocities.col(0) = Vec3_t{1.,0.,0.};
+    // set target 'temperature'/kinetic energy
+    double t_init{temperature_cur(atoms)};
+    double t_wish{t_init * 5.};
+    double dt{0.001};
+
+    // run the simulation
+    berendsen_test(atoms, t_init, t_wish, dt, 1e-9);
+    // assert the final kinetic energy is 5 times the initial kinetic energy:
+    // should be initially 0.5*1*1*1=0.5, finally 5*0.5=2.5
+    ASSERT_NEAR(atoms.kinetic_energy(), 2.5, 1e-9);
+}
