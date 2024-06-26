@@ -207,7 +207,8 @@ impl Atoms {
 
 /// The Lennard-Jones potential
 fn lj_pot(r: f64, epsilon: f64, sigma: f64) -> f64 {
-    4. * epsilon * ((sigma / r).powi(12) - (sigma / r).powi(6))
+    let sig_over_r = sigma / r;
+    4. * epsilon * ((sig_over_r).powi(12) - (sig_over_r).powi(6))
 }
 
 /// The truncated and shifted Lennard-Jones potential with given cutoff distance

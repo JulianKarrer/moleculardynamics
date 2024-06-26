@@ -129,6 +129,24 @@ Atoms::Atoms(const Positions_t &p, const Velocities_t &v, const Masses_t &m)
     forces.setZero();
 };
 
+/// @brief Initialize a set of atoms at positions `p` with velocities `v` with
+/// given names containing their atomic symbols. All other vectors are 0.
+/// @param p initial positions of the atoms
+/// @param v initial velocities of the atoms
+/// @param names names of the atoms, ie. "H", "Au", ...
+Atoms::Atoms(const Positions_t &p, const Velocities_t &v, const Names_t names)
+    : positions{p},
+      velocities{v},
+      forces{3, p.cols()},
+      masses{p.cols()},
+      names(names) {
+    assert(p.cols() == v.cols());
+    forces.setZero();
+    for (auto i{0}; i < p.cols(); i++) {
+        masses(i) = ELEM_NAME_TO_MASS.at(names[i]);
+    }
+};
+
 /// @brief Query the number of atoms in the system.
 /// @return the number of atoms
 size_t Atoms::nb_atoms() const {
