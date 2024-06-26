@@ -1,3 +1,4 @@
 {
-  "C_Cpp.default.compilerPath": "/usr/bin/gcc"
+  "C_Cpp.default.compilerPath": "/usr/bin/gcc",
+  "cmake.sourceDirectory": "/home/student/moleculardynamics/builddir/meson-private/__CMake_compiler_info__"
 }

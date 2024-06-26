@@ -39,7 +39,7 @@ class Atoms {
 /// units are fixed at fs, energies at eV and lengths at Angstrom, such that
 /// masses are given in units of 9.64853321...g/mol to make all units
 /// consistent.
-const double U_PER_MASS_UNIT{1.0 / (9.64853321e-6)};
+const double U_PER_MASS_UNIT{1.0 / (9.64853321e-3)};
 
 /// Map names of elements to their repective atomic masses in units of u.
 /// Data from https://pubchem.ncbi.nlm.nih.gov/periodic-table/
