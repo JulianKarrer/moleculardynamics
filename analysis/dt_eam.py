@@ -123,10 +123,10 @@ plt.ylabel(r"Hamiltonian (eV)")
 plt.tight_layout()
 plt.gcf().set_size_inches(18., 9., forward=True)
 for dt in [
-        "0.25",
-        "0.50",
         "1.00",
-        "5.00"
+        "5.00",
+        "10.00",
+        "20.00"
 ]:
     plot_from_csv("../builddir/dt_eam.csv",
                   dt, r"$\Delta t$ = "+dt)

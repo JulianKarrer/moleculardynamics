@@ -177,10 +177,21 @@ void Atoms::increase_kinetic_energy(double eV) {
     berendsen_thermostat(*this, target_temperature, 1.0, 1.0);
 };
 
+/// @brief Increase the total energy of the system by evenly rescaling
+/// velocities. Takes a target increase in temperature as an argument.
+/// @param K temperature increase in kelvin to achieve
+void Atoms::increase_kinetic_energy_k(double K) {
+    // reuse the berendsen theromstat logic to reach that temperature but set
+    // dt=relaxation_time to make the change instant
+    berendsen_thermostat(*this, temperature_cur(*this)+K, 1.0, 1.0);
+};
+
+/// @brief Resize the underlying arrays of the atoms structure, discarding atoms when size is reduced.
+/// @param new_size new size of the arrays, ie. new number of atoms
 void Atoms::resize(size_t new_size) {
-    positions.resize(new_size);
-    velocities.resize(new_size);
-    forces.resize(new_size);
-    masses.resize(new_size);
+    positions.resize(3,new_size);
+    velocities.resize(3,new_size);
+    forces.resize(3,new_size);
+    masses.resize(1,new_size);
     names.resize(new_size);
 }
