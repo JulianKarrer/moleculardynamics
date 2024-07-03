@@ -1,4 +1,5 @@
 #include "atoms.h"
+#include "thermostat.h"
 #include <algorithm>
 #include <iostream>
 
@@ -163,3 +164,15 @@ double Atoms::kinetic_energy() {
                              masses * 0.5))
         .sum();
 }
+
+/// @brief Increase the total energy of the system by evenly rescaling
+/// velocities
+/// @param eV energy in electron volts to pu into the system
+void Atoms::increase_kinetic_energy(double eV) {
+    // formulate the increase in energy by a target temperature
+    double target_temperature{(kinetic_energy() + eV) /
+                              (KB_EV_K_3_2 * nb_atoms())};
+    // reuse the berendsen theromstat logic to reach that temperature but set
+    // dt=relaxation_time to make the change instant
+    berendsen_thermostat(*this, target_temperature, 1.0, 1.0);
+};

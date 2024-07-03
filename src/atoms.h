@@ -32,6 +32,8 @@ class Atoms {
     size_t nb_atoms() const;
 
     double kinetic_energy();
+
+    void increase_kinetic_energy(double eV);
 };
 
 /// @brief As described in
