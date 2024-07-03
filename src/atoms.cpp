@@ -176,3 +176,11 @@ void Atoms::increase_kinetic_energy(double eV) {
     // dt=relaxation_time to make the change instant
     berendsen_thermostat(*this, target_temperature, 1.0, 1.0);
 };
+
+void Atoms::resize(size_t new_size) {
+    positions.resize(new_size);
+    velocities.resize(new_size);
+    forces.resize(new_size);
+    masses.resize(new_size);
+    names.resize(new_size);
+}

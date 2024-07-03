@@ -34,6 +34,8 @@ class Atoms {
     double kinetic_energy();
 
     void increase_kinetic_energy(double eV);
+
+    void resize(size_t new_size);
 };
 
 /// @brief As described in

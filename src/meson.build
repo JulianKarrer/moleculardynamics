@@ -7,6 +7,7 @@ lib_sources = [  # All source files (excluding headers)
     'neighbors.cpp',
     'ljts.cpp',
     'ducastelle.cpp',
+    'domain.cpp',
     'xyz.cpp'
 ]
 
