@@ -249,7 +249,7 @@ def plots_optimal_eam_timestep():
         r"Gupta/Ducastelle EAM, N=923 Isocahedron, Au at 500K"
     )
     data: CsvDict = data_from_csv(
-        "../builddir/dt_eam.csv", "dt", "t", "Hamiltonian")
+        "dt_eam.csv", "dt", "t", "Hamiltonian")
     for name, [xs, ys] in data.items():
         if name in times_diff_plot:
             x_d, y_d = d_dx(xs, ys)
