@@ -9,7 +9,8 @@ type CsvDict = dict[str,  Graph]
 # read data from csv and return it
 
 
-def data_from_csv(filename: str, run_identifier: str, name_x: str, name_y: str) -> dict[str,  tuple[list[float], list[float]]]:
+# -> dict[str,  tuple[list[float], list[float]]]:
+def data_from_csv(filename: str, run_identifier: str, name_x: str, name_y: str):
     """From a given `filename`, parse a csv file containing data 
     for different runs of a measurement by inspecting the column names in the first row of the file:
 
@@ -38,7 +39,8 @@ def data_from_csv(filename: str, run_identifier: str, name_x: str, name_y: str) 
         return res
 
 
-def d_dx(xs: list[float], ys: list[float]) -> Graph:
+# def d_dx(xs: list[float], ys: list[float]) -> Graph:
+def d_dx(xs, ys):
     """
     Given two lists of length `n` conatining x and y values, differentiate y
     with respect to x numerically using a central difference scheme with O(dx^2) error.
@@ -54,7 +56,7 @@ markerstyles = cycle(["o", "v", "s", "D", "X", "^", "*"])
 
 
 def std_plot(title: str, xlabel: str, ylabel: str, info: str):
-    plt.rcParams['text.usetex'] = True
+    # plt.rcParams['text.usetex'] = True
     plt.rcParams.update({'font.size': 15})
     fig, ax = plt.subplots()
     fig.suptitle(title)
@@ -66,9 +68,10 @@ def std_plot(title: str, xlabel: str, ylabel: str, info: str):
     return fig, ax
 
 
-def plot_line(ax, xs, ys, label: str):
+def plot_line(ax, xs, ys, label: str, use_marker=False):
     colour = next(ax._get_lines.prop_cycler)['color']
-    ax.plot(xs, ys, next(linestyles), label=label, color=colour)
+    ax.plot(xs, ys, next(linestyles), label=label, color=colour,
+            marker=next(markerstyles) if use_marker else None)
 
 
 # def w(d: float, h_bar: float) -> float:

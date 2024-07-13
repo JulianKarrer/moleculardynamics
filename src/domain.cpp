@@ -83,7 +83,7 @@ void Domain::enable(Atoms &atoms) {
     Atoms global_atoms{atoms};
 
     int local_index = 0; // index for atom on local process
-    for (int global_index = 0; global_index < global_atoms.nb_atoms();
+    for (size_t global_index = 0; global_index < global_atoms.nb_atoms();
          global_index++) {
         if ((get_coordinate(global_atoms.positions.col(global_index)) ==
              coordinate_)

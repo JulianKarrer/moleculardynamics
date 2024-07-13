@@ -11,6 +11,9 @@ lto = "fat"
 panic = "abort"
 opt-level = 3
 
+[target.x86_64-unknown-linux-gnu]
+rustflags = ["-C target-cpu=native"]
+
 [dependencies]
 # kd tree for fixed-radius neighbour search
 kiddo = { version = "4.2.0"}

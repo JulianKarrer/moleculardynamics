@@ -27,7 +27,8 @@
 
 #include "neighbors.h"
 
-NeighborList::NeighborList() : seed_{1}, neighbors_{1} {}
+NeighborList::NeighborList() : seed_{1}, neighbors_{1} {
+}
 
 const std::tuple<const Eigen::ArrayXi &, const Eigen::ArrayXi &>
 NeighborList::update(const Atoms &atoms, double cutoff) {
@@ -36,9 +37,9 @@ NeighborList::update(const Atoms &atoms, double cutoff) {
 
     // Avoid computing if atoms is empty
     if (r.size() == 0) {
-      seed_.resize(0);
-      neighbors_.resize(0);
-      return {seed_, neighbors_};
+        seed_.resize(0);
+        neighbors_.resize(0);
+        return {seed_, neighbors_};
     }
 
     // Origin stores the bottom left corner of the enclosing rectangles and
@@ -137,7 +138,7 @@ NeighborList::update(const Atoms &atoms, double cutoff) {
         return neighborhood;
     }();
 
-    for (int i{0}; i < atoms.nb_atoms(); ++i) {
+    for (size_t i{0}; i < atoms.nb_atoms(); ++i) {
         seed_(i) = n;
 
         Eigen::Array3i cell_coord{

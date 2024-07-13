@@ -92,7 +92,7 @@ impl Atoms {
     pub fn lj_direct_sum(&mut self, epsilon: f64, sigma: f64) -> f64 {
         self.frc.fill(Vector3::zeros());
         self.frc
-            .par_iter_mut()
+            .iter_mut()
             .zip(&self.pos)
             .enumerate()
             .map(|(i, (frc_i, x_i))| {
@@ -128,13 +128,13 @@ impl Atoms {
         let kd = kiddo::ImmutableKdTree::new_from_slice(
             &self
                 .pos
-                .par_iter()
+                .iter()
                 .map(|p| p.as_ref().to_owned())
                 .collect::<Vec<[f64; 3]>>(),
         );
         // update forces and return the sum of all pair-potentials
         self.frc
-            .par_iter_mut()
+            .iter_mut()
             .zip(&self.pos)
             .enumerate()
             .map(|(i, (frc_i, x_i))| {
@@ -165,7 +165,7 @@ impl Atoms {
     /// Calculate the total kinetic energy in the system
     pub fn kinetic_energy(&self) -> f64 {
         self.vel
-            .par_iter()
+            .iter()
             .zip(&self.mas)
             .map(|(v, m)| v.norm_squared() * m * 0.5)
             .sum()
@@ -184,7 +184,7 @@ impl Atoms {
         let current_temp = self.temperature();
         // avoid division by zero
         if current_temp > 0.0 {
-            self.vel.par_iter_mut().for_each(|v| {
+            self.vel.iter_mut().for_each(|v| {
                 let lambda = (1. + (target_temp / current_temp - 1.) * dt / relaxation).sqrt();
                 *v *= lambda;
             })
@@ -234,7 +234,7 @@ fn velocity_verlet_step1(
     mas: &MassT,
     dt: f64,
 ) {
-    vel.par_iter_mut()
+    vel.iter_mut()
         .zip(pos)
         .zip(frc)
         .zip(mas)
@@ -246,12 +246,9 @@ fn velocity_verlet_step1(
 
 /// Corrector step of the Velocity Verlet time integration scheme
 fn velocity_verlet_step2(vel: &mut VelocityT, frc: &ForceT, mas: &MassT, dt: f64) {
-    vel.par_iter_mut()
-        .zip(frc)
-        .zip(mas)
-        .for_each(|((v, f), m)| {
-            *v += (*f * (1. / m)) * dt * 0.5;
-        });
+    vel.iter_mut().zip(frc).zip(mas).for_each(|((v, f), m)| {
+        *v += (*f * (1. / m)) * dt * 0.5;
+    });
 }
 
 // define parameters
@@ -261,10 +258,10 @@ const EPSILON: f64 = 1.;
 const CUTOFF: f64 = 5. * SIGMA;
 const TEMPERATURE: f64 = 100.;
 
-const NB_RUNS: usize = 10;
-const NB_TIMESTEPS: usize = 50;
-const NB_ATOMS_MAX: usize = 1000;
-const NB_ATOMS_STEP: usize = 50;
+const NB_RUNS: usize = 2;
+const NB_TIMESTEPS: usize = 100;
+const NB_ATOMS_MAX: usize = 2000;
+const NB_ATOMS_STEP: usize = 100;
 
 /// Run the simulation for `nb_atoms` many atoms, using LJDS or LJTS, and return
 /// the runtime in microseconds.
@@ -303,7 +300,7 @@ fn main() {
             .write(true)
             .create(true)
             .truncate(true)
-            .open("runtimes_ts_par.csv")
+            .open("runtimes.csv")
             .unwrap(),
     );
     // write csv header

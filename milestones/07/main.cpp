@@ -29,7 +29,7 @@ const std::vector<std::string> CLUSTERS{
 /// @param dt the timestep sued
 /// @param temp target temperature
 void heat_up(Atoms &atoms, double dt, double temp) {
-    // give atoms a small random initial velocity so ehating the system affects
+    // give atoms a small random initial velocity so heating the system affects
     // all modes of movement
     atoms.velocities.setRandom();
     atoms.velocities *= 1e-3;

@@ -165,6 +165,18 @@ double Atoms::kinetic_energy() {
         .sum();
 }
 
+/// @brief Compute the total kinetic energy of the first `nb_local` atoms
+/// according to $E_kin = \\sum_i m_i v_i\\cdot v_i$
+/// @param nb_local number of first N atoms to compute the kinetic energy for,
+/// all subsequent atoms in the buffer will be ignored
+/// @return the total kinetic energy of the system
+double Atoms::kinetic_energy(int nb_local, double mass) {
+    return ((Eigen::ArrayXd)(
+                velocities.leftCols(nb_local).colwise().squaredNorm() * mass *
+                0.5))
+        .sum();
+}
+
 /// @brief Increase the total energy of the system by evenly rescaling
 /// velocities
 /// @param eV energy in electron volts to pu into the system
@@ -183,15 +195,17 @@ void Atoms::increase_kinetic_energy(double eV) {
 void Atoms::increase_kinetic_energy_k(double K) {
     // reuse the berendsen theromstat logic to reach that temperature but set
     // dt=relaxation_time to make the change instant
-    berendsen_thermostat(*this, temperature_cur(*this)+K, 1.0, 1.0);
+    berendsen_thermostat(*this, temperature_cur(*this) + K, 1.0, 1.0);
 };
 
-/// @brief Resize the underlying arrays of the atoms structure, discarding atoms when size is reduced.
+/// @brief Resize the underlying arrays of the atoms structure, discarding atoms
+/// when size is reduced.
 /// @param new_size new size of the arrays, ie. new number of atoms
 void Atoms::resize(size_t new_size) {
-    positions.resize(3,new_size);
-    velocities.resize(3,new_size);
-    forces.resize(3,new_size);
-    masses.resize(1,new_size);
-    names.resize(new_size);
+    positions.conservativeResize(Eigen::NoChange, new_size);
+    velocities.conservativeResize(Eigen::NoChange, new_size);
+    forces.conservativeResize(Eigen::NoChange, new_size);
+    // dont resize the following two for now, they are not restored by the
+    // domain masses.conservativeResize(Eigen::NoChange, new_size);
+    // names.resize(new_size);
 }

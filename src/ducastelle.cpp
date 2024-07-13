@@ -35,8 +35,8 @@
  * are the Au parameters from Cleri & Rosato's paper.
  */
 double ducastelle(Atoms &atoms, const NeighborList &neighbor_list,
-                  double cutoff, double A, double xi, double p, double q,
-                  double re) {
+                  double cutoff, int nb_local, double A, double xi, double p,
+                  double q, double re) {
     auto cutoff_sq{cutoff * cutoff};
     double xi_sq{xi * xi};
 
@@ -116,5 +116,5 @@ double ducastelle(Atoms &atoms, const NeighborList &neighbor_list,
     }
 
     // Return total potential energy
-    return energies.sum();
+    return nb_local < 0 ? (energies.sum()) : (energies.head(nb_local).sum());
 }

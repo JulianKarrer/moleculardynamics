@@ -15,13 +15,13 @@ const double CUTOFF{5. * SIGMA};
 const double TEMPERATURE{100.};
 // number of times each run is repeated to get statistics about the runtime
 // (must be >1 for Bessel's correction)
-const size_t NUMBER_OF_RUNS{10};
+const size_t NUMBER_OF_RUNS{2};
 // number of timesteps in each simulation
-const size_t NUMBER_OF_TIMESTEPS{50};
+const size_t NUMBER_OF_TIMESTEPS{100};
 // maximum number of atoms in the test series
-const size_t NB_ATOMS_MAX{1000};
+const size_t NB_ATOMS_MAX{2000};
 // step size of number of atoms in the test series
-const size_t NB_ATOMS_STEP{50};
+const size_t NB_ATOMS_STEP{100};
 
 /// @brief Measure the execution time for the equilibration of a Lennard Jones
 /// lattice with direct summation for a given number of atoms and simulation

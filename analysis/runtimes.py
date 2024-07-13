@@ -4,7 +4,7 @@ from math import atan2, degrees
 from itertools import cycle
 import numpy as np
 import matplotlib.pyplot as plt
-plt.rcParams['text.usetex'] = True
+# plt.rcParams['text.usetex'] = True
 plt.rcParams.update({'font.size': 15})
 
 
@@ -128,22 +128,24 @@ def plot_all_sets(log: bool, legend: bool, plot_stddev: bool):
                 and LJTS (truncated and shifted) potential in C++, Rust and Rust+Rayon respectively")
     plt.xlabel(r"Number of Atoms")
     plt.ylabel(r"Average Runtime in Microseconds ($\mu s$)")
-    plt.tight_layout()
+    # plt.tight_layout()
     plt.gcf().set_size_inches(18., 9., forward=True)
     plot_from_csv("../builddir/runtimes.csv",
                   "direct", "LJDS-CPP", plot_stddev)
     plot_from_csv("../builddir/runtimes.csv", "ljts", "LJTS-CPP", plot_stddev)
     plot_from_csv("../rust/runtimes.csv", "direct", "LJDS-RS", plot_stddev)
-    plot_from_csv("../rust/runtimes_par.csv",
-                  "direct", "LJDS-RS+R", plot_stddev)
-    plot_from_csv("../rust/runtimes.csv", "ljts", "LJTS-RS", plot_stddev)
-    plot_from_csv("../rust/runtimes_par.csv", "ljts", "LJTS-RS+R", plot_stddev)
+    plot_from_csv("../rust/runtimes.csv", "ljts", "LJDS-RS", plot_stddev)
+    # plot_from_csv("../rust/runtimes_par.csv",
+    #   "direct", "LJDS-RS+R", plot_stddev)
+    # plot_from_csv("../rust/runtimes_ts.csv", "ljts", "LJTS-RS", plot_stddev)
+    # plot_from_csv("../rust/runtimes_par.csv", "ljts", "LJTS-RS+R", plot_stddev)
     if legend:
         plt.legend(fontsize="12")
     else:
         labelLines(plt.gca().get_lines(), zorder=2.5, fontsize=8)
     if log:
         plt.yscale("log")
+        plt.xscale("log")
     else:
         plt.yscale("linear")
     if plot_stddev:

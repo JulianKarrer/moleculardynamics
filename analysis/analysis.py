@@ -31,7 +31,7 @@ def model_latent_heat(x, slope1: float, slope2: float, temp_melt: float, energy_
 def plot_gold_temp_over_energy_fitted():
     data: CsvDict = data_from_csv(
         "gold_t_e.csv", "n", "e_total", "temperature")
-    info = r"Gupta/Ducastelle EAM for Au, Mackay Icosahedra, $\Delta t$=1fs, $\tau_{relax}=1000\Delta t$, $\Delta Q=10K \cdot \frac{3}{2}N k_B$"
+    info = r"Ducastelle EAM for Au, Cleri & Rosato Parameters, Mackay Icosahedra, $\Delta t$=1fs, $\tau_{relax}=1000\Delta t$, $\Delta Q=10K \cdot \frac{3}{2}N k_B$"
 
     # plot models of the temperature and average total energy
     fig, ax = std_plot(
@@ -43,8 +43,8 @@ def plot_gold_temp_over_energy_fitted():
     params = dict()
     for name, [xs, ys] in data.items():
         # normalize x by number of atoms for plotting
-        xs = [x/float(name) for x in xs]
         N = float(name)
+        xs = [x/N for x in xs]
         # use non-linear least squares to model to the data
         x = np.array(xs, dtype=np.float64)
         y = np.array(ys, dtype=np.float64)
@@ -65,9 +65,12 @@ def plot_gold_temp_over_energy_fitted():
         r"Heat Capacity $C$ (ev/K)",
         info,
     )
-    cluster_sizes = [float(name) for name in data.keys()]
-    ax_c.plot(cluster_sizes, [
-              float(name)/((params[name][0]+params[name][1])/2.0) for name in data.keys()])
+    xs = [float(name) for name in data.keys()]
+    ys_1 = [1.0/(params[name][0]/float(name)) for name in data.keys()]
+    ys_2 = [1.0/(params[name][1]/float(name)) for name in data.keys()]
+    plot_line(ax_c, xs, ys_1, 'solid', use_marker=True)
+    plot_line(ax_c, xs, ys_2, 'fluid', use_marker=True)
+    ax_c.legend()
 
     # plot model of melting point and cluster size
     fig_melt, ax_melt = std_plot(
@@ -76,7 +79,7 @@ def plot_gold_temp_over_energy_fitted():
         r"Melting Point $T_{melt}$ (K)",
         info,
     )
-    ax_melt.plot(cluster_sizes, [params[name][2] for name in data.keys()])
+    ax_melt.plot(xs, [params[name][2] for name in data.keys()])
 
     # plot model of latent heat and cluster size
     fig_latent, ax_latent = std_plot(
@@ -85,7 +88,7 @@ def plot_gold_temp_over_energy_fitted():
         r"Latent Heat $\Delta Q_{lat}$ (eV)",
         info,
     )
-    ax_latent.plot(cluster_sizes, [params[name][4] for name in data.keys()])
+    ax_latent.plot(xs, [params[name][4] for name in data.keys()])
 
     # save figures ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     fig.savefig("fit_mackay_t_e.png", dpi=400)
@@ -96,7 +99,7 @@ def plot_gold_temp_over_energy_fitted():
 
 def plot_gold_temp_over_energy():
     data: CsvDict = data_from_csv(
-        "../builddir/gold_t_e.csv", "n", "e_total", "temperature")
+        "gold_t_e.csv", "n", "e_total", "temperature")
     info = r"Gupta/Ducastelle EAM for Au, Mackay Icosahedra, $\Delta t$=1fs, $\tau_{relax}=1000\Delta t$, $\Delta Q=10K \cdot \frac{3}{2}N k_B$"
     fig, ax = std_plot(
         r"Temperature $T$ over Average Total Energy $\frac{E_{total}}{N}$ for Different Numbers of Atoms $N$ in the Cluster",
@@ -235,18 +238,19 @@ def plots_optimal_eam_timestep():
     # what runs to plot for each figure
     times_plot = ["1.00", "5.00", "10.00", "20.00"]
     times_diff_plot = ["1.00", "5.00", "10.00",]
+    info = r"Ducastelle EAM, Cleri & Rosato Parameters, N=923 Mackay Isocahedron, Au at 500K"
 
     fig, ax = std_plot(
         r"Time Evolution of the Hamiltonian for different $\Delta t$",
         r"Time $t$ (fs)",
-        r"$\frac{d}{dt} E_{total}$ (eV/fs)",
-        r"Gupta/Ducastelle EAM, N=923 Isocahedron, Au at 500K"
+        r"$E_{total}$ (eV)",
+        info
     )
     fig_d, ax_d = std_plot(
-        r"Time Derivative (Central Differences) of the Hamiltonian for different $\Delta t$",
+        r"Time Evolution of the Derivative of the Hamiltonian for different $\Delta t$",
         r"Time $t$ (fs)",
-        r"$E_{total}$ (eV)",
-        r"Gupta/Ducastelle EAM, N=923 Isocahedron, Au at 500K"
+        r"$\frac{d}{dt} E_{total}$ (eV/fs)",
+        "derivative taken with central differences, " + info
     )
     data: CsvDict = data_from_csv(
         "dt_eam.csv", "dt", "t", "Hamiltonian")
@@ -257,11 +261,30 @@ def plots_optimal_eam_timestep():
         if name in times_plot:
             plot_line(ax, xs, ys, r"$\Delta t$ = "+name+"fs")
     ax_d.legend(fontsize="12")
+    ax.legend(fontsize="12")
     fig_d.savefig("dt_diff_eam.png", dpi=400)
     fig.savefig("dt_eam.png", dpi=400)
 
 
+def plot_parallel_energy_conserved():
+    data = data_from_csv("../builddir/hamiltonian_par.csv",
+                         "nb_processes", "n", "e_total")
+    fig, ax = std_plot(
+        r"Time Evolution of the Hamiltonian for different number of processes",
+        r"Time $t$ (fs)",
+        r"$E_{total}$ (eV)",
+        r"Same scenario each time: Au Mackay Isocahedron N=923 with initial zero velocities"
+    )
+    ys_prev = []
+    for name, (xs, ys) in data.items():
+        xs = [i for i in range(len(xs))]
+        plot_line(ax, xs, ys, name+" processes")
+    ax.legend(fontsize="12")
+    fig.savefig("par_energy_consv.png", dpi=400)
+
+
 if __name__ == "__main__":
-    plots_optimal_eam_timestep()
-    plot_gold_temp_over_energy()
-    plot_gold_temp_over_energy_fitted()
+    # plots_optimal_eam_timestep()
+    # plot_gold_temp_over_energy()
+    # plot_gold_temp_over_energy_fitted()
+    plot_parallel_energy_conserved()
