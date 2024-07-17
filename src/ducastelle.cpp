@@ -35,8 +35,8 @@
  * are the Au parameters from Cleri & Rosato's paper.
  */
 double ducastelle(Atoms &atoms, const NeighborList &neighbor_list,
-                  double cutoff, int nb_local, double A, double xi, double p,
-                  double q, double re) {
+                  double cutoff, int nb_local,double A, double xi, double p, double q,
+                  double re) {
     auto cutoff_sq{cutoff * cutoff};
     double xi_sq{xi * xi};
 
@@ -202,7 +202,7 @@ std::tuple<double, double> ducastelle_stress(Atoms &atoms,
 
                 // sum zz component of the stress tensor
                 if (i < nb_local) {
-                    stress += distance_vector(2) * ((Vec3_t)pair_force)(2);
+                    stress += distance_vector(2) * ((Vec3_t)pair_force)(2) *j>=nb_local?0.5:1.0;
                 }
             }
         }

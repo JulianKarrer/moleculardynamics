@@ -55,7 +55,7 @@ TEST(DucastelleTest, Forces) {
 
     neighbor_list.update(atoms, cutoff);
     atoms.forces.setZero();
-    (void)ducastelle(atoms, neighbor_list, cutoff, A, xi, p, q, re);
+    (void)ducastelle(atoms, neighbor_list, cutoff, -1, A, xi, p, q, re);
     Forces_t forces0{atoms.forces};
 
     // loop over all atoms and compute forces from a finite differences approximation
@@ -65,11 +65,11 @@ TEST(DucastelleTest, Forces) {
             // move atom to the right
             atoms.positions(j, i) += delta;
             neighbor_list.update(atoms, cutoff);
-            double eplus{ducastelle(atoms, neighbor_list, cutoff, A, xi, p, q, re)};
+            double eplus{ducastelle(atoms, neighbor_list, cutoff, -1, A, xi, p, q, re)};
             // move atom to the left
             atoms.positions(j, i) -= 2 * delta;
             neighbor_list.update(atoms, cutoff);
-            double eminus{ducastelle(atoms, neighbor_list, cutoff, A, xi, p, q, re)};
+            double eminus{ducastelle(atoms, neighbor_list, cutoff, -1, A, xi, p, q, re)};
             // move atom back to original position
             atoms.positions(j, i) += delta;
 

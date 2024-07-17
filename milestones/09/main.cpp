@@ -12,11 +12,13 @@
 
 // settings
 const double CUTOFF_RADIUS{10.};
-const double DT{1};
+const double DT{5};
+const double TAU{1000*DT};
+const size_t EQUILIBRATE_FOR{1*TAU};
 const double TEMPERATURE{100.};
-const size_t TIMESTEPS{10000};
-const size_t EQUILIBRATE_FOR{5000};
-const size_t SCALE_EVERY{50};
+
+const size_t TIMESTEPS{5'000'000};
+const double SCALE_EVERY{200'000};
 const size_t PLOT_EVERY{TIMESTEPS / 100};
 const double SPACING{4.079 / sqrt(2)};
 const double BORDER{5 * SPACING};
@@ -67,11 +69,11 @@ int main(int argc, char *argv[]) {
 
     if (domain.rank() == 0) {
         // write csv header to stdout
-        std::cout << "temp,rate,v_x,v_y,v_z,sig_zz,e_pot" << std::endl;
+        std::cout << "temp,rate,v_x,v_y,v_z,f_zz,e_pot" << std::endl;
 
-        // std::cout << std::endl << volume << std::endl;
-        // std::cout << std::endl << min_pos << std::endl;
-        // std::cout << std::endl << max_pos << std::endl;
+        std::cout << std::endl << volume << std::endl;
+        std::cout << std::endl << min_pos << std::endl;
+        std::cout << std::endl << max_pos << std::endl;
         // write_xyz(traj, atoms);
     }
 
@@ -109,8 +111,9 @@ int main(int argc, char *argv[]) {
 
         if (i > EQUILIBRATE_FOR && i % PLOT_EVERY == 0) {
             double stress_g{
-                MPI::allreduce(stress_l, MPI_SUM, domain.communicator()) * 1.0 /
-                volume.prod()};
+                MPI::allreduce(stress_l, MPI_SUM, domain.communicator())  /
+                volume(2)
+                };
             double e_pot_global{
                 MPI::allreduce(e_pot_l, MPI_SUM, domain.communicator())};
 
