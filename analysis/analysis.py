@@ -283,8 +283,24 @@ def plot_parallel_energy_conserved():
     fig.savefig("par_energy_consv.png", dpi=400)
 
 
+def stress_strain_small():
+    data = data_from_csv("../builddir/stress-strain-small.csv",
+                         "rate", "v_z", "sig_zz")
+    fig, ax = std_plot(
+        r"Stress $\underline{\sigma}_{zz}$ as a Function of Strain $\Delta V_z$",
+        r"Strain $V_z$ $(Å)$",
+        r"Stress $\underline{\sigma}_{zz}$ $\left(\frac{103.642u}{Å \cdot (fs)^2}\right)$",
+        r"Small whisker aligned with z-axis, periodic boundary in z-direction, $\Delta t=1fs$"
+    )
+    for _rate, (xs, ys) in data.items():
+        plot_line(ax, xs, ys, "")
+    # ax.legend(fontsize="12")
+    fig.savefig("stress-strain-small.png", dpi=400)
+
+
 if __name__ == "__main__":
     # plots_optimal_eam_timestep()
     # plot_gold_temp_over_energy()
     # plot_gold_temp_over_energy_fitted()
-    plot_parallel_energy_conserved()
+    # plot_parallel_energy_conserved()
+    stress_strain_small()

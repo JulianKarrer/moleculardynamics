@@ -205,7 +205,7 @@ void Atoms::resize(size_t new_size) {
     positions.conservativeResize(Eigen::NoChange, new_size);
     velocities.conservativeResize(Eigen::NoChange, new_size);
     forces.conservativeResize(Eigen::NoChange, new_size);
-    // dont resize the following two for now, they are not restored by the
-    // domain masses.conservativeResize(Eigen::NoChange, new_size);
+    masses.conservativeResize(Eigen::NoChange, new_size);
+    // dont resize the following for now:
     // names.resize(new_size);
 }

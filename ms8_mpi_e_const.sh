@@ -15,7 +15,7 @@ do
   echo RUNNING MPI SIMULATION WITH $i PROCESSES ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   # Use the time command to measure execution time
-  { time -p mpirun --oversubscribe -n $i ./milestones/08/milestone08 $i | grep -E '^[0-9]' >> $output_file; } 2> time_tmp.txt
+  { time -p mpirun --oversubscribe -n $i ./milestones/08/milestone08 | grep -E '^[0-9]' >> $output_file; } 2> time_tmp.txt
 
   # Extract and print the timing information
   real_time=$(grep "real" time_tmp.txt | awk '{print $2}')

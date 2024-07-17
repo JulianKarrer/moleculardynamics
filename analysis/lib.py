@@ -22,6 +22,7 @@ def data_from_csv(filename: str, run_identifier: str, name_x: str, name_y: str):
     """
     with open(filename) as run_rs:
         lines: list[str] = run_rs.readlines()
+        lines = [l for l in lines if "," in l]
         firstline: str = lines[0]
         res: dict[str,  tuple[list[float], list[float]]] = dict()
         cat_index = [i for (i, x) in enumerate(
@@ -32,6 +33,8 @@ def data_from_csv(filename: str, run_identifier: str, name_x: str, name_y: str):
             firstline.split(",")) if y == name_y][0]
         for line in lines[1:]:
             split = line.split(",")
+            if len(split) < max(cat_index, x_index, y_index):
+                continuex
             res.setdefault(split[cat_index], ([], []))
             curxs, curys = res[split[cat_index]]
             res[split[cat_index]] = (
@@ -56,7 +59,7 @@ markerstyles = cycle(["o", "v", "s", "D", "X", "^", "*"])
 
 
 def std_plot(title: str, xlabel: str, ylabel: str, info: str):
-    # plt.rcParams['text.usetex'] = True
+    plt.rcParams['text.usetex'] = True
     plt.rcParams.update({'font.size': 15})
     fig, ax = plt.subplots()
     fig.suptitle(title)

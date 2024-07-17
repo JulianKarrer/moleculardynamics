@@ -12,7 +12,7 @@
 
 // settings
 const double CUTOFF_RADIUS{10.};
-const double DT{0.5};
+const double DT{1};
 const double TEMPERATURE{500.};
 const size_t TIMESTEPS{2000};
 const size_t PLOT_EVERY{10};
@@ -48,22 +48,12 @@ void print_results(Atoms &atoms, const double e_pot_local, Domain &domain,
     }
 }
 
-/// @brief Specify the number of processes to run the simulation on in the first
-/// argument
+/// @brief Run simulations steps on the Mackay 923 Au initial configuration
+/// using MPI to parallelize the computations, plotting the time evolution of
+/// the Hamiltonian to confirm energy conservation or at least equal behaviour
+/// between versions with different numbers of MPI processes.
 int main(int argc, char *argv[]) {
     MPI_Init(&argc, &argv);
-
-    // parse the number of processes
-    int nb_processes{0};
-    if (argc > 1) {
-        nb_processes = atoi(argv[1]);
-        assert(nb_processes > 0);
-    } else {
-        std::cout << "Please specify the number or MPI processes available as "
-                     "the first argument (must be > 0)"
-                  << std::endl;
-        return 1;
-    }
 
     // initialize gold cluster from file
     auto [names, positions,
@@ -79,6 +69,9 @@ int main(int argc, char *argv[]) {
     neighbour_list.update(atoms, CUTOFF_RADIUS);
     (void)ducastelle(atoms, neighbour_list);
 
+    // find the number of MPI processes
+    int nb_processes{0};
+    MPI_Comm_size(MPI_COMM_WORLD, &nb_processes);
     // initialize a domain for periodic boundaries and decomposition for
     // parallelization
     Vec3_t volume{atoms.positions.rowwise().maxCoeff() -
