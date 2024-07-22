@@ -1,6 +1,6 @@
 #include "thermostat.h"
 
-double temperature_cur(Atoms &atoms) {
+double temperature_cur(const Atoms atoms) {
     return atoms.kinetic_energy() / (KB_EV_K_3_2 * atoms.nb_atoms());
 }
 

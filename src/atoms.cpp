@@ -157,7 +157,7 @@ size_t Atoms::nb_atoms() const {
 /// @brief Compute the total kinetic energy of all atoms $E_kin = \\sum_i m_i
 /// v_i\\cdot v_i$
 /// @return the total kinetic energy of the system
-double Atoms::kinetic_energy() {
+double Atoms::kinetic_energy() const {
     // use `colwise()` and `transpose()` to perform the sum using only Eigen
     // functions
     return ((Eigen::ArrayXd)(velocities.colwise().squaredNorm().transpose() *
@@ -170,7 +170,7 @@ double Atoms::kinetic_energy() {
 /// @param nb_local number of first N atoms to compute the kinetic energy for,
 /// all subsequent atoms in the buffer will be ignored
 /// @return the total kinetic energy of the system
-double Atoms::kinetic_energy(int nb_local, double mass) {
+double Atoms::kinetic_energy(int nb_local, double mass) const {
     return ((Eigen::ArrayXd)(
                 velocities.leftCols(nb_local).colwise().squaredNorm() * mass *
                 0.5))

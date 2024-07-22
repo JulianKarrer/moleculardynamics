@@ -31,8 +31,8 @@ class Atoms {
 
     size_t nb_atoms() const;
 
-    double kinetic_energy();
-    double kinetic_energy(int nb_local, double mass);
+    double kinetic_energy() const;
+    double kinetic_energy(int nb_local, double mass) const;
 
     void increase_kinetic_energy(double eV);
 

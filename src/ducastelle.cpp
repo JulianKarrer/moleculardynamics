@@ -35,8 +35,8 @@
  * are the Au parameters from Cleri & Rosato's paper.
  */
 double ducastelle(Atoms &atoms, const NeighborList &neighbor_list,
-                  double cutoff, int nb_local,double A, double xi, double p, double q,
-                  double re) {
+                  double cutoff, int nb_local, double A, double xi, double p,
+                  double q, double re) {
     auto cutoff_sq{cutoff * cutoff};
     double xi_sq{xi * xi};
 
@@ -119,7 +119,7 @@ double ducastelle(Atoms &atoms, const NeighborList &neighbor_list,
     return nb_local < 0 ? (energies.sum()) : (energies.head(nb_local).sum());
 }
 
-std::tuple<double, double> ducastelle_stress(Atoms &atoms,
+std::tuple<double, Mat3_t> ducastelle_stress(Atoms &atoms,
                                              const NeighborList &neighbor_list,
                                              int nb_local, double cutoff,
                                              double A, double xi, double p,
@@ -157,7 +157,7 @@ std::tuple<double, double> ducastelle_stress(Atoms &atoms,
     Eigen::ArrayXd energies{embedding};
 
     // compute forces
-    double stress{0.};
+    Mat3_t stress{Eigen::Matrix3d::Zero()};
     for (auto [i, j] : neighbor_list) {
         if (i < j) {
             double d_embedding_density_i{0};
@@ -202,7 +202,9 @@ std::tuple<double, double> ducastelle_stress(Atoms &atoms,
 
                 // sum zz component of the stress tensor
                 if (i < nb_local) {
-                    stress += distance_vector(2) * ((Vec3_t)pair_force)(2) *j>=nb_local?0.5:1.0;
+                    stress += distance_vector *
+                              ((Vec3_t)pair_force).transpose() *
+                              ((j >= nb_local) ? (0.5) : (1.0));
                 }
             }
         }

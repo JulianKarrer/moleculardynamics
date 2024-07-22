@@ -33,6 +33,6 @@ void berendsen_thermostat_decomposed(Atoms &atoms, double temperature,
 /// @brief Current temperature of the system.
 /// @param atoms `Atoms` to measure the temperature of
 /// @return current temperature in Kelvins
-double temperature_cur(Atoms &atoms);
+double temperature_cur(const Atoms atoms);
 
 #endif // __THERMOSTAT

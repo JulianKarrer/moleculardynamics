@@ -2,6 +2,7 @@
 *.xyz
 .idea
 .vscode
+videos
 
 # -------------- Below are genereated exclusion patterns ----------------------
 

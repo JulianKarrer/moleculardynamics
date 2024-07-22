@@ -3,6 +3,7 @@
 from lib import *
 import numpy as np
 from scipy.optimize import curve_fit
+import subprocess
 
 
 def model_latent_heat(x, slope1: float, slope2: float, temp_melt: float, energy_melt: float, latent_heat: float) -> float:
@@ -283,19 +284,78 @@ def plot_parallel_energy_conserved():
     fig.savefig("par_energy_consv.png", dpi=400)
 
 
-def stress_strain_small():
-    data = data_from_csv("../builddir/stress-strain-small.csv",
-                         "rate", "v_z", "sig_zz")
+def stress_strain():
+    # N=3050, 300K, 10**8 strainrate
     fig, ax = std_plot(
-        r"Stress $\underline{\sigma}_{zz}$ as a Function of Strain $\Delta V_z$",
-        r"Strain $V_z$ $(Å)$",
-        r"Stress $\underline{\sigma}_{zz}$ $\left(\frac{103.642u}{Å \cdot (fs)^2}\right)$",
-        r"Small whisker aligned with z-axis, periodic boundary in z-direction, $\Delta t=1fs$"
+        r"Force $F_{zz}$ acting on the $xy$-Plane as a Function of Strain $\frac{\Delta V_z}{V_{z_0}}$",
+        r"Strain $\frac{\Delta V_z}{V_{z_0}}$",
+        r"Force $F_{zz}=\frac{V\cdot\sigma_{zz}}{V_z}$ $\left(\frac{eV}{Å}\right)$",
+        r"N=3050, Ducastelle EAM Au whisker aligned with z-axis, periodic boundary in z-direction, $\Delta t=5fs, \tau=1ps, \epsilon=10^8, T=300K$"
     )
-    for _rate, (xs, ys) in data.items():
-        plot_line(ax, xs, ys, "")
-    # ax.legend(fontsize="12")
-    fig.savefig("stress-strain-small.png", dpi=400)
+    for v0, (xs, ys) in data_from_csv("whisker_3050/whisker_small.csv",
+                                      "v_z_0", "v_z", "f_zz").items():
+        ax.plot([x/float(v0)-1 for x in xs], ys)
+    fig.tight_layout()
+    fig.savefig("stress-strain-3050.png", dpi=400)
+
+    # N=51_500, 300K, 10**8 strainrate
+    fig, ax = std_plot(
+        r"Force $F_{zz}$ acting on the $xy$-Plane as a Function of Strain $\frac{\Delta V_z}{V_{z_0}}$",
+        r"Strain $\frac{\Delta V_z}{V_{z_0}}$",
+        r"Force $F_{zz}=\frac{V\cdot\sigma_{zz}}{V_z}$ $\left(\frac{eV}{Å}\right)$",
+        r"N=51500, Ducastelle EAM Au whisker aligned with z-axis, periodic boundary in z-direction, $\Delta t=5fs, \tau=1ps$"
+    )
+    for v0, (xs, ys) in data_from_csv("../builddir/whisker_large_fast.csv",
+                                      "v_z_0", "v_z", "f_zz").items():
+        plot_line(ax, [x/float(v0)-1 for x in xs],
+                  ys, r"$\epsilon=2\cdot 10^8, T=300K$")
+    for v0, (xs, ys) in data_from_csv("whisker_51500/whisker_large.csv",
+                                      "v_z_0", "v_z", "f_zz").items():
+        plot_line(ax, [x/float(v0)-1 for x in xs],
+                  ys, r"$\epsilon=1\cdot 10^8, T=300K$")
+    for v0, (xs, ys) in data_from_csv("../builddir/whisker_large_cold.csv",
+                                      "v_z_0", "v_z", "f_zz").items():
+        plot_line(ax, [x/float(v0)-1 for x in xs],
+                  ys, r"$\epsilon=1\cdot 10^8, T=200K$")
+    fig.tight_layout()
+    ax.legend(fontsize="12")
+    fig.savefig("stress-strain-51_500-strainrate.png", dpi=400)
+
+
+def run(command: str):
+    subprocess.run(command.split(" "))
+
+
+def stress_strain_animation():
+    run("rm ../videos/whisker_51500_graph/*.png")
+    data = data_from_csv("whisker_51500/whisker_large.csv",
+                         "v_z_0", "v_z", "f_zz")
+    plt.rcParams['text.usetex'] = True
+    plt.rcParams.update({'font.size': 20})
+    xlabel = r"Strain $\frac{\Delta V_z}{V_{z_0}}$"
+    ylabel = r"Force $F_{zz}$"
+    info = r"N=51500, Ducastelle EAM Au whisker aligned with z-axis, periodic boundary in z-direction, $\Delta t=5fs, \tau=1ps, \epsilon=10^8, T=300K$"
+    v0, (xs, ys) = list(data.items())[0]
+    for i in range(len(xs)):
+        dpi = 100
+        fig, ax = plt.subplots(figsize=(1920/dpi, 500/dpi))
+        fig.text(0.99, 0.01, info, horizontalalignment='right', fontsize="10")
+        ax.set_xlabel(xlabel)
+        ax.set_ylabel(ylabel)
+        fig.tight_layout()
+
+        for v0, (xs, ys) in data.items():
+            xs = [x/float(v0) for x in xs]
+            ax.plot(xs, ys)
+            ax.axvline(xs[i], c="red", alpha=0.4, lw=3)
+        fig.tight_layout()
+        print(i, end="\r")
+        fig.savefig("../videos/whisker_51500_graph/" +
+                    "{:05d}".format(i)+".png", dpi=dpi)
+        plt.close()
+    print()
+    run("ffmpeg -framerate 60 -pattern_type glob -i '../videos/whisker_51500_graph/*.png' -an -preset veryslow -y ../videos/graph.mp4")
+    run("ffmpeg -i ../videos/whisker_51500_3views.mp4 -i ../videos/graph.mp4 -filter_complex vstack=inputs=2 -an -preset veryslow -y ../videos/whisker_51500_graph.mp4")
 
 
 if __name__ == "__main__":
@@ -303,4 +363,6 @@ if __name__ == "__main__":
     # plot_gold_temp_over_energy()
     # plot_gold_temp_over_energy_fitted()
     # plot_parallel_energy_conserved()
-    stress_strain_small()
+    stress_strain()
+
+    # stress_strain_animation()

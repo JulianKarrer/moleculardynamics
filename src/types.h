@@ -8,5 +8,6 @@ using Forces_t = Eigen::Array3Xd;
 using Masses_t = Eigen::ArrayXd;
 using Vec3_t = Eigen::Vector3d;
 using Names_t = std::vector<std::string>;
+using Mat3_t = Eigen::Matrix3d;
 
 #endif // __TYPES_H
