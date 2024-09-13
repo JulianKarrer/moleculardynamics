@@ -40,5 +40,5 @@ meson test
 - Milestone 9: `builddir/milestones/09/milestone09` uses the parameters at the top of `milestones/09/main.cpp` to simulate a gold nanowire being pulled. Especially the strain rate, temperature and the filename at the top were adjusted for the report, producing correspondingly named `csv` files as a result. The commented out values of `PLOT_EVERY, STRETCH_BY_PERCENT, SCALE_AFTER_N` were used along with `long_whisker.xyz` to produce the MPI scaling tests in the number of processes in the report, performed using `ms9_scaling_test_mpi.sh` 
 
 # Video of Gold Nanowire being pulled:
-<a href="https://www.youtube.com/watch?v=aHFvy7gYslU" target="_blank"><img src="https://raw.githubusercontent.com/JulianKarrer/moleculardynamics/main/thumbnail.jpg"/></a>
+<a href="https://www.youtube.com/watch?v=aHFvy7gYslU" target="_blank"><img src="https://raw.githubusercontent.com/JulianKarrer/moleculardynamics/main/analysis/thumbnail.jpg"/></a>
 
