@@ -12,7 +12,7 @@ Repository for coursework concerning the summer 2024 course [Molecular Dynamics 
 
 
 # Reproducing figures
-Just run `/analysis/analysis.py`.
+Just run `/analysis/analysis.py` (uses `matplotlib, scipy` and preferrably `python3.12`)
 
 The corresponding `csv` files were copied over from `builddir` and can themselves be reproduced by running the code as described below for each imlestone.
 
