@@ -17,13 +17,14 @@ Just run `/analysis/analysis.py`.
 The corresponding `csv` files were copied over from `builddir` and can themselves be reproduced by running the code as described below for each imlestone.
 
 # Running the Code
-- Setup: ```
-  cd <your repository>
-  meson setup builddir --buildtype=release
-  cd builddir
-  meson compile
-  meson test
-  ```
+- Setup:
+```
+cd <your repository>
+meson setup builddir --buildtype=release
+cd builddir
+meson compile
+meson test
+```
 - Milestone 1: Run  `builddir/milestones/01/milestone01` to check if the build system works
 - Milestone 2: Run  `builddir/milestones/02/milestone02` for a test of energy conservation using Velocity Verlet 
 - Milestone 3: Run `builddir/milestones/03/milestone03` and copy `lj54.xyz` to `builddir` to run a Lennard-Jones direct summation simulation, with results in `builddir/traj.xyz`
