@@ -93,10 +93,38 @@ TEST(LJDirectSummationTest, CorrectMinimumAndEquilibriumDistance) {
         verlet_step2(atoms.velocities, atoms.forces, dt, atoms.masses);
         // assert that particles at r_min distance stay at that distance
         Vec3_t distance{atoms.positions.col(0) - atoms.positions.col(1)};
-        EXPECT_NEAR(distance.norm(), r_min, 1e-6);
+        EXPECT_NEAR(distance.norm(), r_min, 1e-10);
         // the potential energy at r_min shoould be -epsilon
-        EXPECT_NEAR(potential, -epsilon, 1e-6);
+        EXPECT_NEAR(potential, -epsilon, 1e-10);
     }
+}
+
+// Test if the potential is negative for distances above sigma, zero at sigma
+// and positive otherwise.
+TEST(LJDirectSummationTest, LennardJonesPotentialPosNegAroundSigma) {
+    constexpr int nb_atoms = 2;
+    constexpr double epsilon = 0.7;
+    constexpr double sigma = 0.3;
+    Atoms atoms(nb_atoms);
+    atoms.positions(0, 0) = 0.0;
+
+    // assert V>0 for distance<sigma
+    for (double dist :
+         {sigma * 0.01, sigma * 0.25, sigma * 0.5, sigma * 0.99}) {
+        atoms.positions(0, 1) = dist;
+        double potential{lj_direct_summation(atoms, epsilon, sigma)};
+        EXPECT_GT(potential, 0.0);
+    }
+    // assert V<0 for distance>sigma
+    for (double dist : {sigma * 1.01, sigma * 1.25, sigma * 1.5}) {
+        atoms.positions(0, 1) = dist;
+        double potential{lj_direct_summation(atoms, epsilon, sigma)};
+        EXPECT_LT(potential, 0.0);
+    }
+    // assert V=0 for distance=sigma
+    atoms.positions(0, 1) = sigma;
+    double potential{lj_direct_summation(atoms, epsilon, sigma)};
+    EXPECT_NEAR(potential, 0.0, 1e-10);
 }
 
 // Test if momentum is conserved

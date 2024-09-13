@@ -7,7 +7,7 @@
 /// conditions defined in the `TEST`s in the following
 void berendsen_test(Atoms &atoms, double t_init, double t_wish, double dt,
                     double assert_tolerance) {
-    // Perform 20k simulation steps to make sure the system should have
+    // Perform 10k simulation steps to make sure the system should have
     // calibrated
     lj_direct_summation(atoms, 1., 1.);
     for (uint step = 0; step < 10000; step++) {
@@ -66,13 +66,14 @@ TEST(BerendsenThermosTest, ToZero) {
 }
 
 /// @brief Check if a single atom at the origin with initial unit velocity
-/// in x-direction speeds up to the velocity dictated by the target 
+/// in x-direction speeds up to the velocity dictated by the target
 /// kinetic energy
 TEST(BerendsenThermosTest, SingleAtom) {
-    // set initial position at origin and initial velocity to unit vector in x-direction
+    // set initial position at origin and initial velocity to unit vector in
+    // x-direction
     Atoms atoms{Atoms(1)};
     atoms.positions.setZero();
-    atoms.velocities.col(0) = Vec3_t{1.,0.,0.};
+    atoms.velocities.col(0) = Vec3_t{1., 0., 0.};
     // set target 'temperature'/kinetic energy
     double t_init{temperature_cur(atoms)};
     double t_wish{t_init * 5.};

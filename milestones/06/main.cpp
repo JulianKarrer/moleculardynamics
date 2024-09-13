@@ -15,11 +15,11 @@ const double CUTOFF{5. * SIGMA};
 const double TEMPERATURE{100.};
 // number of times each run is repeated to get statistics about the runtime
 // (must be >1 for Bessel's correction)
-const size_t NUMBER_OF_RUNS{2};
+const size_t NUMBER_OF_RUNS{10};
 // number of timesteps in each simulation
 const size_t NUMBER_OF_TIMESTEPS{100};
 // maximum number of atoms in the test series
-const size_t NB_ATOMS_MAX{2000};
+const size_t NB_ATOMS_MAX{4000};
 // step size of number of atoms in the test series
 const size_t NB_ATOMS_STEP{100};
 

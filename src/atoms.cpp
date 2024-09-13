@@ -14,9 +14,9 @@
 void initialize_lattice(Positions_t &positions, size_t n, double spacing) {
     size_t cube_length{(size_t)std::ceil(std::cbrt(n))};
     size_t i{0};
-    for (size_t x{0}; x < cube_length + 1; x++) {
-        for (size_t y{0}; y < cube_length + 1; y++) {
-            for (size_t z{0}; z < cube_length + 1; z++) {
+    for (size_t x{0}; x < cube_length; x++) {
+        for (size_t y{0}; y < cube_length; y++) {
+            for (size_t z{0}; z < cube_length; z++) {
                 if (i >= n) {
                     return;
                 }

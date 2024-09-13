@@ -14,8 +14,10 @@
 const double DT{5};
 const double TAU{1000.};
 const size_t SCALE_AFTER_N{(size_t)round(10 * TAU)};
-const double TEMPERATURE{200.};
+// const size_t SCALE_AFTER_N{0};
+const double TEMPERATURE{300.};
 const double STRAIN_RATE_HZ{1e8};
+// const double STRETCH_BY_PERCENT{0.01};
 const double STRETCH_BY_PERCENT{30};
 const std::string FILENAME{"whisker_large_cold"};
 
@@ -24,6 +26,7 @@ const double CUTOFF_RADIUS{10.};
 const size_t TIMESTEPS{(size_t)ceil((STRETCH_BY_PERCENT / 100.) /
                                     (STRAIN_RATE_HZ) / (DT * 1e-15))};
 const size_t PLOT_EVERY{TIMESTEPS / 1000};
+// const size_t PLOT_EVERY{TIMESTEPS / 2};
 const double SPACING{4.079 / sqrt(2)};
 const double BORDER{50 * SPACING};
 

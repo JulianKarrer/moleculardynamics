@@ -1,4 +1,5 @@
 #include "atoms.h"
+#include "lj_direct_summation.h"
 #include "verlet.h"
 #include "xyz.h"
 #include <ducastelle.h>
@@ -96,7 +97,7 @@ double step(Atoms &atoms, double dt, NeighborList &neighbour_list) {
 /// @param filename the file to read the particle data from
 void run_at_dt(double dt, double total_time, std::ofstream &dt_eam_file,
                const std::string filename) {
-    // initialiye gold cluster from file
+    // initialize gold cluster from file
     auto [names, positions, velocities]{read_xyz_with_velocities(filename)};
     Atoms atoms{Atoms(names, positions)};
 
@@ -150,6 +151,37 @@ int main(int argc, char *argv[]) {
         }
         return 0;
     }
+    // FIND OPTIMAL TIMESTEP SIZE
+    else if (argc > 1 && std::string(argv[1]) == "timestepljds") {
+        // total time to simulate the system for
+        double total_time{2.};
+        // open a csv file for the results, write the header
+        std::ofstream dt_ljds_file("dt_ljds.csv");
+        dt_ljds_file << "dt,t,Hamiltonian,E_pot,E_kin," << std::endl;
+        // try some timestep sizes, record the time evolution of the hamiltonian
+        // for each
+        for (double dt : {0.01, 0.005, 0.002, 0.001}) {
+            std::ofstream debugtraj("debug.xyz");
+            // initialize oblique grid
+            Atoms atoms{Atoms((size_t)1000, (double)(pow(2, 1. / 6.)))};
+            (void)lj_direct_summation(atoms);
+            double t{0};
+            while (t < total_time) {
+                write_xyz(debugtraj, atoms);
+                verlet_step1(atoms.positions, atoms.velocities, atoms.forces,
+                             dt, atoms.masses);
+                double potential{lj_direct_summation(atoms)};
+                verlet_step2(atoms.velocities, atoms.forces, dt, atoms.masses);
+                double kinetic = atoms.kinetic_energy();
+                dt_ljds_file << std::fixed << std::setprecision(3) << dt << ","
+                             << std::fixed << std::setprecision(10) << t << ","
+                             << kinetic + potential << "," << potential << ","
+                             << kinetic << std::endl;
+                t += dt;
+            }
+        }
+        return 0;
+    }
 
     // EAM ISOCAHEDRON ENERGY-TEMPERATURE GRAPH
     // settings
@@ -184,8 +216,8 @@ int main(int argc, char *argv[]) {
         double current_temp{0.};
         double e_pot{0.0};
 
-        // // might as well record the trajectory to check plausibility of
-        // results std::ofstream traj("gold_t_e_traj.xyz");
+        // might as well record the trajectory to check plausibility of results
+        std::ofstream traj("gold_t_e_traj.xyz");
 
         // then, repeatedly increase temperature, wait for tau_relax, measure
         // energy and temperature for tau_relax
@@ -215,7 +247,7 @@ int main(int argc, char *argv[]) {
                      << std::setprecision(15) << avg_e_tot * normalize << ","
                      << avg_t * normalize << "," << avg_e_pot * normalize << ","
                      << avg_e_kin * normalize << std::endl;
-            // write_xyz(traj, atoms);
+            write_xyz(traj, atoms);
             // update current temperature
             current_temp = temperature_cur(atoms);
             // print to std:out to watch the process

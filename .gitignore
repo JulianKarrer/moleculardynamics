@@ -4,6 +4,10 @@
 .vscode
 videos
 
+# exclude large MD result files
+whisker_large_traj.xyz
+whisker_traj.xyz
+
 # -------------- Below are genereated exclusion patterns ----------------------
 
 # Created by https://www.toptal.com/developers/gitignore/api/clion

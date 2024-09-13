@@ -13,7 +13,6 @@
 // settings
 const double CUTOFF_RADIUS{10.};
 const double DT{1};
-const double TEMPERATURE{500.};
 const size_t TIMESTEPS{2000};
 const size_t PLOT_EVERY{10};
 

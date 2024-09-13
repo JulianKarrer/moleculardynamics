@@ -2,8 +2,8 @@
 from itertools import cycle
 import matplotlib.pyplot as plt
 
-type Graph = tuple[list[float], list[float]]
-type CsvDict = dict[str,  Graph]
+# type Graph = tuple[list[float], list[float]]
+# type CsvDict = dict[str,  Graph]
 
 
 # read data from csv and return it
@@ -58,22 +58,23 @@ linestyles = cycle(["-", "--", "-.", ":"])
 markerstyles = cycle(["o", "v", "s", "D", "X", "^", "*"])
 
 
-def std_plot(title: str, xlabel: str, ylabel: str, info: str):
+def std_plot(title: str, xlabel: str, ylabel: str, info: str, size=1.2):
     plt.rcParams['text.usetex'] = True
-    plt.rcParams.update({'font.size': 15})
+    plt.rcParams.update({'font.size': 14})
     fig, ax = plt.subplots()
     fig.suptitle(title)
     fig.text(0.99, 0.01, info, horizontalalignment='right', fontsize="10")
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
     fig.tight_layout()
-    fig.set_size_inches(16., 9., forward=True)
+    fig.set_size_inches(8.*size, 4.5*size, forward=True)
     return fig, ax
 
 
 def plot_line(ax, xs, ys, label: str, use_marker=False):
-    colour = next(ax._get_lines.prop_cycler)['color']
-    ax.plot(xs, ys, next(linestyles), label=label, color=colour,
+    # colour = next(ax._get_lines.prop_cycler)['color']
+    # colour = "r"
+    ax.plot(xs, ys, next(linestyles), label=label,
             marker=next(markerstyles) if use_marker else None)
 
 
